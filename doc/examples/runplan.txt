@@ -1,0 +1,25 @@
+- load:
+  - "doc/examples/data"
+- modify:
+  - "doc/examples/modification"
+- fill:
+    templates:
+    - "doc/examples/templates"
+    target:
+    - "local/example/results"
+    results:
+      files:
+      - "local/example/results/*":
+          count: 2
+          content:
+          - verbatim: "This is header row\n"
+          - pattern: "Value: .*\n"
+            count: 2
+          - verbatim: "This is footer\n"
+- run:
+    command: "ls"
+    parameters:
+    - "local/example/results"
+    output:
+    - "result-first.txt"
+    - "result-second.txt"
