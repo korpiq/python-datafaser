@@ -5,9 +5,35 @@ Use simplest possible descriptions to fulfill goals such as information system s
 
 Datafaser uses descriptions specific for a chosen purpose to enrich given data step by step.
 The outcome of each step is verified by a description of expected outcome.
-Finally that data can be used to generate files and execute operations.
+Finally that data can be used to generate files, possibly including scripts for later operations.
 
-## Order of operations
+## Guidelines
+
+### Simple data format
+
+ - Plain data structure, without custom objects, for reliable operation and output.
+ - Only string keys in dictionaries to ensure consistent referencing.
+ - Schemas should not allow for null values.
+ - Nulls can be used when loading, before validation (if these uses can be clearly distinct)
+   - to denote a field to be fulfilled
+   - to remove previously defined values.
+
+### Avoid dependencies
+
+Try to separate each dependency to its own `extra` package,
+so depending projects can select what to install in their `requirements.txt`:
+
+    datafaser[yaml,jsonschema]
+
+### Base schema
+
+Add to jsonschema:
+ - `description` required for each field definition; make it clear somewhere that it means `purpose`
+ - `required` boolean required for each field definition (generate `required` for containing Object from these?)
+ - disallow `additionalProperties` to require all data to be validated
+ - maybe use only `patternProperties`?
+
+## Operation
 
 Datafaser needs one thing to start: a run plan. It defines the steps to take:
 
@@ -64,16 +90,12 @@ Template operations should be constrained to a subset common to engines in many 
 
 Produced results can be checked with simplish result format specifiers.
 
-### Operation Runner
-
-External programs can be run with parameters filled in from data.
-
 ## Safety Restrictions
 
 ### Access only files under current working directory
 
 All file references are ensured to stay within current working directory.
-External programs must be found in environment PATH.
+If at all needed, External programs must be found in environment PATH.
 
 ### Separate resource downloader to ensure offline operation
 
