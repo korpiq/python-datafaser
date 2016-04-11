@@ -1,0 +1,4 @@
+syntax: regexp
+
+^local/
+.*/__pycache__/
