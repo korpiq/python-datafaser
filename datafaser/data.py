@@ -3,6 +3,15 @@ Operations on plain deep data structures.
 """
 
 class Data:
+    """
+    Data object contains a free form data structure.
+
+    Nested dictionaries and lists can be accessed with key lists.
+
+    Dictionary contents can be merged and lists appended to.
+
+    Other data types can only be stored as leaves of the data tree structure.
+    """
 
     def __init__(self, data, separator='.'):
         self.data = data is None and {} or data
@@ -32,3 +41,45 @@ class Data:
                     (self.separator.join(key_path[:index]), self.separator.join(key_path)))
 
         return data                
+
+    def merge(self, add_data, key_path=None):
+        if key_path and len(key_path):
+           my_data = self.dig(key_path)
+        else:
+           my_data = self.data
+           key_path = []
+
+        result = self._merge_node(add_data, my_data, [], [])
+
+        if len(key_path):
+            self.dig(key_path[:-1])[key_path[-1]] = result
+        else:
+            self.data = result
+
+    def _merge_node(self, add_data, my_data, key_path, ids):
+        my_id = id(my_data)
+        if my_id in ids:
+            return my_data # cyclic reference already being merged. FIXME: store and return new_data
+        else:
+            ids.append(my_id)
+
+        if isinstance(add_data, dict):
+            if isinstance(my_data, dict):
+                return self._merge_dictionaries(add_data, my_data, key_path, ids)
+        elif isinstance(add_data, list):
+            if isinstance(my_data, list):
+                return my_data + add_data
+
+        return add_data
+
+    def _merge_dictionaries(self, add_data, my_data, key_path, ids):
+        new_data = my_data.copy()
+
+        for key, value in add_data.items():
+            if key in my_data:
+                new_data[key] = self._merge_node(value, my_data[key], key_path + [key], ids)
+            else:
+                new_data[key] = value
+        
+        return new_data
+
