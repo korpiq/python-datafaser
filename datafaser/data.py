@@ -49,35 +49,35 @@ class Data:
            my_data = self.data
            key_path = []
 
-        result = self._merge_node(add_data, my_data, [], [])
+        result = self._merge_node(add_data, my_data, [], {})
 
         if len(key_path):
             self.dig(key_path[:-1])[key_path[-1]] = result
         else:
             self.data = result
 
-    def _merge_node(self, add_data, my_data, key_path, ids):
-        my_id = id(my_data)
-        if my_id in ids:
-            return my_data # cyclic reference already being merged. FIXME: store and return new_data
-        else:
-            ids.append(my_id)
-
+    def _merge_node(self, add_data, my_data, key_path, results):
         if isinstance(add_data, dict):
             if isinstance(my_data, dict):
-                return self._merge_dictionaries(add_data, my_data, key_path, ids)
+                return self._merge_dictionaries(add_data, my_data, key_path, results)
         elif isinstance(add_data, list):
             if isinstance(my_data, list):
                 return my_data + add_data
 
         return add_data
 
-    def _merge_dictionaries(self, add_data, my_data, key_path, ids):
+    def _merge_dictionaries(self, add_data, my_data, key_path, results):
+
+        my_id = id(my_data)
+        if my_id in results:  # cyclic reference already being merged.
+            return results[my_id]
+
         new_data = my_data.copy()
+        results[my_id] = new_data
 
         for key, value in add_data.items():
             if key in my_data:
-                new_data[key] = self._merge_node(value, my_data[key], key_path + [key], ids)
+                new_data[key] = self._merge_node(value, my_data[key], key_path + [key], results)
             else:
                 new_data[key] = value
         

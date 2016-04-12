@@ -39,15 +39,18 @@ class DataTest(unittest.TestCase):
          self.assertIsNot(d2, result, 'Added dict not used')
          self.assertEqual({'foo': 'quu', 'baz': 2}, result, 'New dict contains overriding item')
 
-     def test_merge_self_containing_structures_ok(self):
+     def test_merge_cyclic_reference_ok(self):
          d1 = {'foo': {'zer': 'zor'}, 'zup': 'zop'}
          d1['foo']['bar'] = d1
          d2 = {'foo': {'baz': 'quu'}, 'zip': 'zap'}
          d2['foo']['bar'] = d2
          expected = {'foo': {'baz': 'quu', 'zer': 'zor'}, 'zip': 'zap', 'zup': 'zop'}
-         expected['foo']['bar'] = expected
+
          result = self._merge(d1, d2)
-         self.assertEqual(expected, result, 'Dicts are merged with back reference')
+
+         self.assertIs(result, result['foo']['bar'], 'Dicts are merged with cyclic reference')
+         del result['foo']['bar']
+         self.assertEqual(expected, result, 'Dicts are merged despite cyclic reference')
 
      def _merge(self, data1, data2):
          d = Data(data1)
