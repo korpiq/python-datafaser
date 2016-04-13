@@ -18,6 +18,9 @@ class Data:
         self.separator = separator
 
     def dig(self, key_path, create_containers=False):
+        return self._dig_or_bury(key_path, create_containers)[0]
+
+    def _dig_or_bury(self, key_path, create_containers=False, set_key=None, set_value=None):
         if isinstance(key_path, str):
             key_path = key_path.split(self.separator)
         data = self.data
@@ -40,33 +43,36 @@ class Data:
                 raise KeyError('No container at "%s" trying to get "%s"' %
                     (self.separator.join(key_path[:index]), self.separator.join(key_path)))
 
-        return data                
+        if set_key:
+            data[set_key] = set_value
+
+        return data, key_path
 
     def merge(self, add_data, key_path=None):
         if key_path and len(key_path):
-           my_data = self.dig(key_path, create_containers=True)
+            my_data, key_path = self._dig_or_bury(key_path, create_containers=True)
         else:
-           my_data = self.data
-           key_path = []
+            my_data = self.data
+            key_path = []
 
-        result = self._merge_node(add_data, my_data, [], {})
+        result = self._merge_node(add_data, my_data, {})
 
         if len(key_path):
-            self.dig(key_path[:-1])[key_path[-1]] = result
+            self._dig_or_bury(key_path[:-1], set_key=key_path[-1], set_value=result)
         else:
             self.data = result
 
-    def _merge_node(self, add_data, my_data, key_path, results):
+    def _merge_node(self, add_data, my_data, results):
         if isinstance(add_data, dict):
             if isinstance(my_data, dict):
-                return self._merge_dictionaries(add_data, my_data, key_path, results)
+                return self._merge_dictionaries(add_data, my_data, results)
         elif isinstance(add_data, list):
             if isinstance(my_data, list):
                 return my_data + add_data
 
         return add_data
 
-    def _merge_dictionaries(self, add_data, my_data, key_path, results):
+    def _merge_dictionaries(self, add_data, my_data, results):
 
         my_id = id(my_data)
         if my_id in results:  # cyclic reference already being merged.
@@ -77,7 +83,7 @@ class Data:
 
         for key, value in add_data.items():
             if key in my_data:
-                new_data[key] = self._merge_node(value, my_data[key], key_path + [key], results)
+                new_data[key] = self._merge_node(value, my_data[key], results)
             else:
                 new_data[key] = value
         
