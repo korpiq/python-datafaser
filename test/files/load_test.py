@@ -1,5 +1,6 @@
+import os
 import unittest
-from datafaser.loader import FileLoader
+from datafaser.files import FileLoader
 from datafaser.data import Data
 
 
@@ -20,25 +21,25 @@ class DataTest(unittest.TestCase):
     def test_loads_yaml_map_ok(self):
         data = Data({})
         loader = FileLoader(data)
-        loader.load(['test/loader/testdata/yaml_files/a_map.yaml'])
+        loader.load(self._path('yaml_files','a_map.yaml'))
         self.assertEquals(self.expected['yaml_files']['a_map'], data.data, 'Loader loads contents from yaml file')
 
     def test_loads_yaml_ok(self):
         data = {}
         loader = FileLoader(Data(data))
-        loader.load(['test/loader/testdata/yaml_files'])
+        loader.load(self._path('yaml_files'))
         self.assertEquals(self.expected['yaml_files'], data, 'Loader loads yaml')
 
     def test_loads_json_ok(self):
         data = {}
         loader = FileLoader(Data(data))
-        loader.load(['test/loader/testdata/json_files'])
+        loader.load(self._path('json_files'))
         self.assertEquals(self.expected['json_files'], data, 'Loader loads json')
 
     def test_loads_text_ok(self):
         data = {}
         loader = FileLoader(Data(data))
-        loader.load(['test/loader/testdata/text_files'])
+        loader.load(self._path('text_files'))
         self.assertEquals(self.expected['text_files'], data, 'Loader loads text')
 
     def test_loading_without_parser_fails(self):
@@ -46,7 +47,7 @@ class DataTest(unittest.TestCase):
         loader = FileLoader(Data(data))
         exception = None
         try:
-            loader.load(['test/loader/testdata/ignored_files'])
+            loader.load(self._path('ignored_files'))
         except Exception as e:
             exception = e
         self.assertIsNotNone(exception, 'Loading with unknown extension must fail')
@@ -56,7 +57,7 @@ class DataTest(unittest.TestCase):
         parsers = FileLoader.parsers.copy()
         parsers[None] = FileLoader.Parsers.ignore
         loader = FileLoader(Data(data), parsers)
-        loader.load(['test/loader/testdata'])
+        loader.load(self._path())
         self.assertEquals(self.expected, data, 'Loader loads all supported types of data')
 
     def test_load_with_absolute_path_fails(self):
@@ -73,8 +74,12 @@ class DataTest(unittest.TestCase):
         loader = FileLoader(Data({}))
         exception = None
         try:
-            loader.load(['../test/loader/testdata/text_files'])
+            loader.load(os.path.sep.join(['..', self._path()]))
         except Exception as e:
             exception = e
 
         self.assertIsNotNone(exception, 'Loading from backtracking path must fail')
+
+    @staticmethod
+    def _path(*parts):
+        return [os.path.join('test', 'files', 'test_data', *parts)]
