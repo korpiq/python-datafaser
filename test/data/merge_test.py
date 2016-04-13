@@ -1,6 +1,7 @@
 import unittest
 from datafaser.data import Data
 
+
 class DataTest(unittest.TestCase):
 
     def test_merge_scalar_ok(self):
@@ -38,6 +39,30 @@ class DataTest(unittest.TestCase):
         self.assertIsNot(d1, result, 'Original dict not used')
         self.assertIsNot(d2, result, 'Added dict not used')
         self.assertEqual({'foo': 'quu', 'baz': 2}, result, 'New dict contains overriding item')
+
+    def test_merge_repeated_references_ok(self):
+        repeated = {
+            'rabbit hole': {
+                'Rei': 'Who am I?',
+                'Shinji': 'Why am I here?'
+            }
+        }
+        expected = {
+            'deep': repeated,
+            'down': repeated,
+            'inside': {'honey': 'you', 'need': 'love'}
+        }
+        repeated1 = {'rabbit hole': {'Rei': 'Who am I?'}}
+        repeated2 = {'rabbit hole': {'Shinji': 'Why am I here?'}}
+        d1 = {'deep': repeated1, 'down': repeated1, 'inside': {'honey': 'you'}}
+        d2 = {'deep': repeated2, 'down': repeated2, 'inside': {'need': 'love'}}
+
+        result = self._merge(d1, d2)
+
+        self.assertEqual(expected, result, 'Dicts containing repeated entries are merged')
+        self.assertIs(result['deep'], result['down'], 'Repeated references are reflected in result')
+        self.assertIsNot(result['deep'], d1['deep'], 'Repeated references do not target source data')
+        self.assertIsNot(result['deep'], d2['deep'], 'Repeated references do not target merge data')
 
     def test_merge_cyclic_reference_ok(self):
         d1 = {'foo': {'zer': 'zor'}, 'zup': 'zop'}
