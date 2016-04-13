@@ -90,4 +90,4 @@ class FileLoaderTest(unittest.TestCase):
 
     @staticmethod
     def _path(*parts):
-        return [os.path.join('test', 'files', 'test_data', *parts)]
+        return [os.path.join('test', 'test_data', *parts)]
