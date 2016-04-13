@@ -44,7 +44,7 @@ class Data:
 
     def merge(self, add_data, key_path=None):
         if key_path and len(key_path):
-           my_data = self.dig(key_path)
+           my_data = self.dig(key_path, create_containers=True)
         else:
            my_data = self.data
            key_path = []

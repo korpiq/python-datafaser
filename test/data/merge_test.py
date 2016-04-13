@@ -52,7 +52,12 @@ class DataTest(unittest.TestCase):
          del result['foo']['bar']
          self.assertEqual(expected, result, 'Dicts are merged despite cyclic reference')
 
-     def _merge(self, data1, data2):
+     def test_merge_into_nonexisting_branch_ok(self):
+         result = self._merge({}, ['thingy'], key_path=['sub', 'part'])
+         expected = {'sub': {'part': ['thingy']}}
+         self.assertEqual(expected, result, 'Merging into nonexisting branch creates it')
+
+     def _merge(self, data1, data2, **kwargs):
          d = Data(data1)
-         d.merge(data2)
+         d.merge(data2, **kwargs)
          return d.data
