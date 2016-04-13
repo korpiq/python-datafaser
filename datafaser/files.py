@@ -97,6 +97,54 @@ class FileLoader:
         return parts[0], len(parts) > 1 and parts[1] or None
 
 
+class FileSaver:
+
+    class Savers:
+
+        @staticmethod
+        def yaml(data, stream):
+            import yaml
+            yaml.safe_dump(data, stream, default_flow_style=False)
+
+        @staticmethod
+        def json(data, stream):
+            import json
+            json.dump(data, stream, indent=4)
+            stream.write('\n')
+
+        @staticmethod
+        def text(data, stream):
+            import numbers
+            if isinstance(data, str) or isinstance(data, numbers.Number):
+                stream.write(str(data))
+            else:
+                raise TypeError('Can not write "%s" as text' % type(data))
+
+    savers = {
+        'yaml': Savers.yaml,
+        'json': Savers.json,
+        'text': Savers.text
+    }
+
+    def __init__(self, data):
+        """
+        :param data: raw data structure
+        """
+        self.data = data
+
+    def save(self, filename, output_format):
+        if output_format in self.savers:
+            saver = self.savers[output_format]
+        else:
+            raise ValueError('Unsupported output format: "%s"' % output_format)
+
+        if filename == '-':
+            saver(self.data, sys.stdout)
+        else:
+            with open(_ensure_allowed_path(filename), 'w') as file:
+                saver(self.data, file)
+
+
 def _ensure_allowed_path(filename):
     full_path = os.path.abspath(filename)
     current_dir = os.path.abspath(os.curdir)
