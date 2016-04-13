@@ -1,22 +1,22 @@
 Datafaser
----------
+=========
 
-Datafaser collects and generates data, then fills in templates to generate files and run commands to handle them.
+Datafaser collects and generates data, then fills in templates to generate files.
 
 Results of each phase are checked against data schemas and content descriptions.
 
 Setup
-=====
+-----
 
     . setup
 
 Testing
-=======
+-------
 
     nosetests -v
 
 Use
-===
+---
 
     datafaser doc/examples/runplan.yaml
 
