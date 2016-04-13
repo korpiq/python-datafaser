@@ -4,7 +4,7 @@ from datafaser.files import FileLoader
 from datafaser.data import Data
 
 
-class DataTest(unittest.TestCase):
+class FileLoaderTest(unittest.TestCase):
 
     expected = {
         'yaml_files': {'a_list': ['foo', 'bar'], 'a_map': {'foo': 'bar'}},
@@ -56,9 +56,17 @@ class DataTest(unittest.TestCase):
         data = {}
         parsers = FileLoader.parsers.copy()
         parsers[None] = FileLoader.Parsers.ignore
-        loader = FileLoader(Data(data), parsers)
+        loader = FileLoader(Data(data), parsers=parsers)
         loader.load(self._path())
         self.assertEquals(self.expected, data, 'Loader loads all supported types of data')
+
+    def test_loads_mixed_formats_with_default_parser_ok(self):
+        data = {}
+        loader = FileLoader(Data(data), default_format='text')
+        loader.load(self._path())
+        expected = self.expected.copy()
+        expected['ignored_files'] = {'filename_without_extension': 'This file name no extension, such wild.\n'}
+        self.assertEquals(expected, data, 'Loader loads all supported types of data')
 
     def test_load_with_absolute_path_fails(self):
         loader = FileLoader(Data({}))

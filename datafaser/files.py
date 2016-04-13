@@ -1,4 +1,5 @@
 import os
+import sys
 
 
 class FileLoader:
@@ -25,17 +26,20 @@ class FileLoader:
 
     parsers = {
         'yaml': Parsers.yaml,
+        'yml': Parsers.yaml,
         'json': Parsers.json,
+        'text': Parsers.text,
         'txt': Parsers.text,
         'skip': Parsers.ignore
     }
 
-    def __init__(self, data, parsers=None):
+    def __init__(self, data, default_format=None, parsers=None):
         """
         :param data: datafaser.data.Data object to load into
         :param parsers: map of file extensions to parser functions
         """
         self.data = data
+        self.default_format = default_format
         if parsers:
             self.parsers = parsers
 
@@ -51,37 +55,54 @@ class FileLoader:
         """
 
         for source in sources:
-            absolute_source = os.path.abspath(source)
-            current_dir = os.path.abspath(os.curdir)
-            if not absolute_source.startswith(current_dir):
-                raise FileNotFoundError('Path must be inside current directory "%s": "%s"' % (current_dir, source))
-
-            if os.path.isfile(absolute_source):
-                _, extension = self._basename_and_extension(absolute_source)
-                self._read_file(absolute_source, extension, None)
-            elif os.path.isdir(absolute_source):
-                for path, dirs, filenames in os.walk(absolute_source):
-                    relative_path = path[len(absolute_source):]
-                    for filename in filenames:
-                        bare_name, extension = self._basename_and_extension(filename)
-                        key_path = relative_path.split(os.path.sep)[1:] + [bare_name]
-                        self._read_file(os.path.join(path, filename), extension, key_path)
+            if source == '-':
+                self._read_file(sys.stdin, self.default_format, None)
             else:
-                raise FileNotFoundError('Not a file or directory: "%s"' % source)
+                self._read_file_or_directory(_ensure_allowed_path(source))
 
-    def _read_file(self, filepath, extension, key_path):
-        if extension in self.parsers:
-            with open(filepath) as stream:
-                parsed = self.parsers[extension](stream)
-                if parsed is not None:
-                    self.data.merge(parsed, key_path=key_path)
+    def _read_file_or_directory(self, absolute_source):
+        if os.path.isfile(absolute_source):
+            _, extension = self._basename_and_extension(absolute_source)
+            with open(absolute_source) as stream:
+                self._read_file(stream, extension, None)
+        elif os.path.isdir(absolute_source):
+            self._read_directory(absolute_source)
         else:
-            raise FileExistsError('Unsupported file: "%s"' % filepath)
+            raise FileNotFoundError('Not a file or directory: "%s"' % absolute_source)
+
+    def _read_directory(self, absolute_source):
+        for path, dirs, filenames in os.walk(absolute_source):
+            relative_path = path[len(absolute_source):]
+            for filename in filenames:
+                bare_name, extension = self._basename_and_extension(filename)
+                key_path = relative_path.split(os.path.sep)[1:] + [bare_name]
+                with open(os.path.join(path, filename)) as stream:
+                    self._read_file(stream, extension, key_path)
+
+    def _read_file(self, stream, extension, key_path):
+        if extension in self.parsers:
+            parser = self.parsers[extension]
+        elif self.default_format in self.parsers:
+            parser = self.parsers[self.default_format]
+        else:
+            raise FileExistsError('File format unknown: "%s"' % stream.name)
+
+        parsed = parser(stream)
+        if parsed is not None:
+            self.data.merge(parsed, key_path=key_path)
 
     @staticmethod
     def _basename_and_extension(filename):
         parts = os.path.basename(filename).rsplit('.', 1)
-        if len(parts) > 1:
-            return parts
-        else:
-            return parts, None
+        return parts[0], len(parts) > 1 and parts[1] or None
+
+
+def _ensure_allowed_path(filename):
+    full_path = os.path.abspath(filename)
+    current_dir = os.path.abspath(os.curdir)
+    if full_path.startswith(current_dir):
+        return full_path
+
+    raise FileNotFoundError(
+        'Will not access file "%s" outside current directory: "%s"' % (full_path, current_dir)
+    )
