@@ -1,25 +1,45 @@
-- load:
-  - "doc/examples/data"
-- modify:
-  - "doc/examples/modification"
+- load:  # merge data: new entries will be added. Existing ones will be replaced.
+    from:
+    - files:  # you can list several sources. Each can be either files or data
+      - "doc/examples/data/initial"  # you can list several sources to load from
+      - "doc/examples/data/custom"   # values from latter ones will override former ones
+    - files:
+      - "doc/examples/schema"
+      to:  # you can but don't have to specify a specific target for a single input
+      - data: "schema"  # you can name a place in the data structure to merge this data to, default is top level
+    to:
+    - files:  # you can save the data in a structured data format into files
+      - yaml: "reports/loaded.yaml"
+#  After each phase (top level step) data must be consistent with schema, so update both at same step as necessary.
+- enrich:  # read some data and produce new data based on it.
+    each:  # repeat for each subitem in given set
+    - data: "settings"
+    by:  # use templates from data or files to generate data in specific format.
+    - data:
+      - yaml: "generator"
+    as: "setting"  # you can specify a name by which the generator will see current subitem.
+    to:  # specify targets for the enriched data
+      - data:
+        - "generated"
 - fill:
-    templates:
-    - "doc/examples/templates"
-    target:
-    - "local/example/results"
+    each:
+    - files:
+      - "doc/examples/templates"
+    to:
+    - files: "local/example/results"
     results:
       files:
       - "local/example/results/*":
           count: 2
-          content:
+          structure:
           - verbatim: "This is header row\n"
-          - pattern: "Value: .*\n"
-            count: 2
+          - name: "group"
+            structure:
+            - verbatim: "Begin value group "
+            - pattern: ".*"
+              name: "group_name"
+            - verbatim "\n"
+            - pattern: "Value: .*\n"
+              count: 2
+            - verbatim: "End value group\n"
           - verbatim: "This is footer\n"
-- run:
-    command: "ls"
-    parameters:
-    - "local/example/results"
-    output:
-    - "result-first.txt"
-    - "result-second.txt"
