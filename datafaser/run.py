@@ -45,14 +45,15 @@ class Runner:
         if operations:
             self.operations = operations
 
-    def run(self, plan):
+    def run(self, phase):
         """
-        :param plan: list of phases: a phase is a map from operation name to its parameter structure.
+        :param phase: list of steps: each step is a map from operation name to its parameter structure.
         """
 
-        for phase in plan:
-            for operation in phase.keys():
+        for step in phase:
+            for operation in step.keys():
                 if operation in self.operations:
-                    self.operations[operation](self.data, phase[operation])
+                    print('Run operation "%s"' % operation)
+                    self.operations[operation](self.data, step[operation])
                 else:
                     raise ValueError('Unknown operation: "%s"' % operation)

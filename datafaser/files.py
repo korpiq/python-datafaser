@@ -57,8 +57,10 @@ class FileLoader:
         for source in sources:
             if source == '-':
                 self._read_file(sys.stdin, self.default_format, None)
-            else:
+            elif isinstance(source, str):
                 self._read_file_or_directory(_ensure_allowed_path(source))
+            else:
+                raise ValueError('File source name must be text: "%s" is %s' % (source, type(source)))
 
     def _read_file_or_directory(self, absolute_source):
         if os.path.isfile(absolute_source):
