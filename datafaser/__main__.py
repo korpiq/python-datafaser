@@ -7,10 +7,10 @@ if this_path not in sys.path:
 
 
 if __name__ == '__main__':
-    from datafaser.start import Start
+    from datafaser.start import create_runner_to_load
 
     try:
-        Start(sys.argv[1:]).load_and_run_all_plans()
+        create_runner_to_load(sys.argv[1:]).load_and_run_all_plans()
     except Exception as e:
         sys.stderr.write('Datafaser run failed on %s: %s' % (e.__class__.__name__, str(e)))
         if 'datafaser_debug' in os.environ:

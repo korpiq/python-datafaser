@@ -1,39 +1,7 @@
-from datafaser.data import Data
-from datafaser.files import FileLoader, FileSaver
+import datafaser.operations
 
 
 class Runner:
-
-    class Operations:
-
-        @staticmethod
-        def load(data, directives):
-            new_data = Data({})
-
-            if 'from' in directives:
-                for source in directives['from']:
-                    if 'files' in source:
-                        if not isinstance(source, dict):
-                            raise TypeError('Not a dict: %s: "%s"' % (type(source), source))
-                        FileLoader(new_data).load(source['files'])
-                    if 'data' in source:
-                        for key in source['data']:
-                            new_data.merge(data.dig(key))
-
-            if 'to' in directives:
-                for target in directives['to']:
-                    if 'data' in target:
-                        data.merge(new_data.data, target['data'])
-                    if 'files' in target:
-                        writer = FileSaver(new_data.data)
-                        for output_format, filename in target['files'].items():
-                            writer.save(filename, output_format)
-            else:
-                data.merge(new_data.data)
-
-    operations = {
-        'load': Operations.load
-    }
 
     def __init__(self, data, operations=None):
         """
@@ -42,15 +10,37 @@ class Runner:
         """
 
         self.data = data
-        if operations:
-            self.operations = operations
+        self.operations = operations or datafaser.operations.get_default_operations_map()
+        self.phase_number = 0
 
-    def run(self, phase):
+    def load_and_run_all_plans(self):
         """
-        :param phase: list of steps: each step is a map from operation name to its parameter structure.
+        Runs plans as long as any are available at `datafaser.run.plan`.
         """
 
-        for step in phase:
+        while len(self.data.dig('datafaser.run.plan')) > 0:
+            self.phase_number += 1
+            run = self.data.dig('datafaser.run')
+            phase = run['plan'].pop()
+            if isinstance(phase, dict) and len(phase) == 1:
+                run['phase'] = phase
+                for phase_name, operations in phase.items():
+                    print('Running phase #%d: "%s"' % (self.phase_number, phase_name))
+                    self.run_operation(operations)
+                run['done'].append(phase)
+                del run['phase']
+            else:
+                raise ValueError(
+                        'Phase #%d in plan does not map one name to operations: %s' %
+                        (self.phase_number, str(phase))
+                )
+
+    def run_operation(self, operations):
+        """
+        :param operations: list of operations: a map from operation name to its parameter structure.
+        """
+
+        for step in operations:
             for operation in step.keys():
                 if operation in self.operations:
                     print('Run operation "%s"' % operation)

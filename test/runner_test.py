@@ -18,24 +18,24 @@ class RunnerTest(unittest.TestCase):
         pass
 
     def test_run_empty_ok(self):
-        Runner(self.data).run([])
+        Runner(self.data).run_operation([])
         self.assertEquals({}, self.data.data, 'Empty run does not add data')
 
     def test_run_load_nothing_ok(self):
-        Runner(self.data).run([{'load': {}}])
+        Runner(self.data).run_operation([{'load': {}}])
         self.assertEquals({}, self.data.data, 'Empty load list does not add data')
 
     def test_run_load_zero_files_ok(self):
-        Runner(self.data).run([{'load': {'from': [{'files': []}]}}])
+        Runner(self.data).run_operation([{'load': {'from': [{'files': []}]}}])
         self.assertEquals({}, self.data.data, 'Empty load files list does not add data')
 
     def test_run_load_yaml_from_directory_ok(self):
-        Runner(self.data).run(self._read_yaml_plan.copy())
+        Runner(self.data).run_operation(self._read_yaml_plan.copy())
         self.assertEquals(self._read_yaml_result, self.data.data, 'Load files from directory adds data')
 
     def test_run_load_to_data_ok(self):
         self.maxDiff = None
         plan = [{'load': {'from': self._read_yaml_plan[0]['load']['from'], 'to': [{'data': 'inner.target'}]}}]
-        Runner(self.data).run(plan)
+        Runner(self.data).run_operation(plan)
         expected = {'inner': {'target': self._read_yaml_result}}
         self.assertEquals(expected, self.data.data, 'Load files from directory adds to specified place in data')
