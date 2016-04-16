@@ -1,47 +1,20 @@
 import os
 import sys
+from datafaser.formats import FormatRegister
 
 
 class FileLoader:
 
-    class Parsers:
-
-        @staticmethod
-        def yaml(stream):
-            import yaml
-            return yaml.load(stream)
-
-        @staticmethod
-        def json(stream):
-            import json
-            return json.load(stream)
-
-        @staticmethod
-        def text(stream):
-            return stream.read()
-
-        @staticmethod
-        def ignore(stream):
-            pass
-
-    parsers = {
-        'yaml': Parsers.yaml,
-        'yml': Parsers.yaml,
-        'json': Parsers.json,
-        'text': Parsers.text,
-        'txt': Parsers.text,
-        'skip': Parsers.ignore
-    }
-
-    def __init__(self, data, default_format=None, parsers=None):
+    def __init__(self, data, default_format=None, format_register=None):
         """
         :param data: datafaser.data.Data object to load into
-        :param parsers: map of file extensions to parser functions
+        :param default_format: string name of format to use for files without a registered filename extension
+        :param format_register: datafaser.formats.FormatRegister object providing file format modules
         """
+
         self.data = data
         self.default_format = default_format
-        if parsers:
-            self.parsers = parsers
+        self.format_register = format_register or FormatRegister()
 
     def load(self, sources):
         """
@@ -82,14 +55,12 @@ class FileLoader:
                     self._read_file(stream, extension, key_path)
 
     def _read_file(self, stream, extension, key_path):
-        if extension in self.parsers:
-            parser = self.parsers[extension]
-        elif self.default_format in self.parsers:
-            parser = self.parsers[self.default_format]
+        if self.format_register.is_known_filename_extension(extension):
+            file_format = self.format_register.get_format_by_filename_extension(extension)
         else:
-            raise FileExistsError('File format unknown: "%s"' % stream.name)
+            file_format = self.format_register.get_format_by_name(self.default_format)
 
-        parsed = parser(stream)
+        parsed = file_format.read(stream)
         if parsed is not None:
             self.data.merge(parsed, key_path=key_path)
 
@@ -101,50 +72,27 @@ class FileLoader:
 
 class FileSaver:
 
-    class Savers:
-
-        @staticmethod
-        def yaml(data, stream):
-            import yaml
-            yaml.safe_dump(data, stream, default_flow_style=False)
-
-        @staticmethod
-        def json(data, stream):
-            import json
-            json.dump(data, stream, indent=4)
-            stream.write('\n')
-
-        @staticmethod
-        def text(data, stream):
-            import numbers
-            if isinstance(data, str) or isinstance(data, numbers.Number):
-                stream.write(str(data))
-            else:
-                raise TypeError('Can not write "%s" as text' % type(data))
-
-    savers = {
-        'yaml': Savers.yaml,
-        'json': Savers.json,
-        'text': Savers.text
-    }
-
-    def __init__(self, data):
+    def __init__(self, data, format_register=None):
         """
         :param data: raw data structure
         """
+
         self.data = data
+        self.format_register = format_register or FormatRegister()
 
     def save(self, filename, output_format):
-        if output_format in self.savers:
-            saver = self.savers[output_format]
-        else:
-            raise ValueError('Unsupported output format: "%s"' % output_format)
+        """
+        :param filename: string: path and name to file to write
+        :param output_format: string: name of format to output
+        """
+
+        file_format = self.format_register.get_format_by_name(output_format)
 
         if filename == '-':
-            saver(self.data, sys.stdout)
+            file_format.write(self.data, sys.stdout)
         else:
             with open(_ensure_allowed_path(filename), 'w') as file:
-                saver(self.data, file)
+                file_format.write(self.data, file)
 
 
 def _ensure_allowed_path(filename):

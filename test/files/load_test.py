@@ -3,6 +3,7 @@ import unittest
 from datafaser.files import FileLoader
 from datafaser.data import Data
 from test.files import path_to_test_data
+from datafaser.formats import FormatRegister
 
 
 class FileLoaderTest(unittest.TestCase):
@@ -54,10 +55,10 @@ class FileLoaderTest(unittest.TestCase):
         self.assertIsNotNone(exception, 'Loading with unknown extension must fail')
 
     def test_loads_mixed_formats_skipping_extensionless_ok(self):
+        register = FormatRegister()
+        register.register('datafaser.formats.ignore', None)
         data = {}
-        parsers = FileLoader.parsers.copy()
-        parsers[None] = FileLoader.Parsers.ignore
-        loader = FileLoader(Data(data), parsers=parsers)
+        loader = FileLoader(Data(data), format_register=register)
         loader.load(path_to_test_data())
         self.assertEquals(self.expected, data, 'Loader loads all supported types of data')
 
