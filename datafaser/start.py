@@ -4,6 +4,7 @@ Builds first run plan to load files given as arguments.
 
 from datafaser.data import Data
 from datafaser.run import Runner
+from datafaser import formats
 
 
 def create_runner_to_load(files):
@@ -27,7 +28,8 @@ def create_plan_to_load_files(files):
                 'arguments': files,
                 'plan': [get_load_phase_for_files(files)],
                 'done': []
-            }
+            },
+            'formats': formats.default_settings
         }
     }
 

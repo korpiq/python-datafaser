@@ -1,11 +1,10 @@
 import os
 import sys
-from datafaser.formats import FormatRegister
 
 
 class FileLoader:
 
-    def __init__(self, data, default_format=None, format_register=None):
+    def __init__(self, data, format_register, default_format=None):
         """
         :param data: datafaser.data.Data object to load into
         :param default_format: string name of format to use for files without a registered filename extension
@@ -14,7 +13,7 @@ class FileLoader:
 
         self.data = data
         self.default_format = default_format
-        self.format_register = format_register or FormatRegister()
+        self.format_register = format_register
 
     def load(self, sources):
         """
@@ -57,8 +56,12 @@ class FileLoader:
     def _read_file(self, stream, extension, key_path):
         if self.format_register.is_known_filename_extension(extension):
             file_format = self.format_register.get_format_by_filename_extension(extension)
-        else:
+        elif self.format_register.is_known_format_name(self.default_format):
             file_format = self.format_register.get_format_by_name(self.default_format)
+        else:
+            raise FileExistsError(
+                    'No content format associated with filename extension "%s": "%s"' % (extension, stream.name)
+            )
 
         parsed = file_format.read(stream)
         if parsed is not None:
@@ -72,13 +75,13 @@ class FileLoader:
 
 class FileSaver:
 
-    def __init__(self, data, format_register=None):
+    def __init__(self, data, format_register):
         """
         :param data: raw data structure
         """
 
         self.data = data
-        self.format_register = format_register or FormatRegister()
+        self.format_register = format_register
 
     def save(self, filename, output_format):
         """

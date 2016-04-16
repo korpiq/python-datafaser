@@ -6,11 +6,11 @@ class Runner:
     def __init__(self, data, operations=None):
         """
         :param data: datafaser.data.Data object
-        :param operations: map to operation names to functions implementing them
+        :param operations: map of operation names to functions implementing them
         """
 
         self.data = data
-        self.operations = operations or datafaser.operations.get_default_operations_map()
+        self.operations = operations or datafaser.operations.get_default_operations_map(data)
         self.phase_number = 0
 
     def load_and_run_all_plans(self):

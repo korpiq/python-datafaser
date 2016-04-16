@@ -1,4 +1,20 @@
-__all__ = ['ignore', 'json', 'text', 'yaml']
+default_settings = {
+    'format_handlers_by_name': {
+        'yaml': 'datafaser.formats.yaml',
+        'json': 'datafaser.formats.json',
+        'text': 'datafaser.formats.text',
+        'ignore': 'datafaser.formats.ignore'
+    },
+    'formats_by_filename_extension': {
+        'ignore': 'ignore',
+        'json': 'json',
+        'yaml': 'yaml',
+        'yml': 'yaml',
+        'skip': 'ignore',
+        'text': 'text',
+        'txt': 'text'
+    }
+}
 
 
 class FormatRegister:
@@ -13,46 +29,35 @@ class FormatRegister:
     Each format module provides functions to read and write streams in that format.
     """
 
-    default_filename_extension_mapping = {
-        'yml': 'yaml',
-        'txt': 'text',
-        'skip': 'ignore'
-    }
-
-    def __init__(self, format_module_names_by_name=None, formats_by_file_extension=None):
-        if format_module_names_by_name:
-            self.format_module_names_by_name = format_module_names_by_name
-        else:
-            self.format_module_names_by_name = {key: __name__ + '.' + key for key in __all__}
-
-        if formats_by_file_extension:
-            self.formats_by_file_extension = formats_by_file_extension
-        else:
-            self.formats_by_file_extension = {}
-            for key in self.format_module_names_by_name.keys():
-                self.formats_by_file_extension[key] = key
-            self.formats_by_file_extension.update(self.default_filename_extension_mapping)
+    def __init__(self, format_handlers_by_name, formats_by_filename_extension):
+        self.format_handlers_by_name = format_handlers_by_name
+        self.formats_by_filename_extension = formats_by_filename_extension
 
     def get_format_by_name(self, name):
-        full_name = self.format_module_names_by_name[name]
-        namespace, relative_name = full_name.rsplit('.', 1)
-        return __import__(full_name, fromlist=[relative_name])
+        if name in self.format_handlers_by_name:
+            full_name = self.format_handlers_by_name[name]
+            namespace, relative_name = full_name.rsplit('.', 1)
+            return __import__(full_name, fromlist=[relative_name])
+        else:
+            raise KeyError('Unknown format name: "%s"' % name)
 
     def get_format_by_filename_extension(self, extension):
-        return self.get_format_by_name(self.formats_by_file_extension[extension])
+        return self.get_format_by_name(self.formats_by_filename_extension[extension])
+
+    def is_known_format_name(self, name):
+        return name in self.format_handlers_by_name
 
     def is_known_filename_extension(self, extension):
-        if extension in self.formats_by_file_extension:
-            return True
+        return extension in self.formats_by_filename_extension
 
     def register(self, module_name, format_name, filename_extension_list=None):
-        self.format_module_names_by_name[format_name] = module_name
+        self.format_handlers_by_name[format_name] = module_name
         if filename_extension_list:
             for extension in filename_extension_list:
-                self.formats_by_file_extension[extension] = format_name
+                self.formats_by_filename_extension[extension] = format_name
 
     def unregister(self, format_name):
-        del self.format_module_names_by_name[format_name]
-        for key, value in self.formats_by_file_extension.items():
+        del self.format_handlers_by_name[format_name]
+        for key, value in self.formats_by_filename_extension.items():
             if value == format_name:
-                del self.formats_by_file_extension[key]
+                del self.formats_by_filename_extension[key]
