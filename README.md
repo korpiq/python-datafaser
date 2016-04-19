@@ -13,7 +13,7 @@ Setup
 Testing
 -------
 
-    nosetests -v
+    nosetests --with-coverage --cover-package=datafaser
 
 Use
 ---
