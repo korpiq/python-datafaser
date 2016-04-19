@@ -42,6 +42,8 @@ class FormatRegister:
             raise KeyError('Unknown format name: "%s"' % name)
 
     def get_format_by_filename_extension(self, extension):
+        if extension not in self.formats_by_filename_extension:
+            raise KeyError('Unknown filename extension: "%s"' % extension)
         return self.get_format_by_name(self.formats_by_filename_extension[extension])
 
     def is_known_format_name(self, name):
@@ -58,6 +60,6 @@ class FormatRegister:
 
     def unregister(self, format_name):
         del self.format_handlers_by_name[format_name]
-        for key, value in self.formats_by_filename_extension.items():
-            if value == format_name:
-                del self.formats_by_filename_extension[key]
+        self.formats_by_filename_extension = {
+            key: value for key, value in self.formats_by_filename_extension.items() if value != format_name
+        }
