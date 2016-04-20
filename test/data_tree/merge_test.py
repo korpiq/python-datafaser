@@ -1,8 +1,8 @@
 import unittest
-from datafaser.data import Data
+from datafaser.data_tree import DataTree
 
 
-class DataTest(unittest.TestCase):
+class MergeTest(unittest.TestCase):
 
     def test_merge_scalar_ok(self):
         result = self._merge('foo', 'bar')
@@ -83,6 +83,6 @@ class DataTest(unittest.TestCase):
         self.assertEqual(expected, result, 'Merging into nonexisting branch creates it')
 
     def _merge(self, data1, data2, **kwargs):
-        d = Data(data1)
+        d = DataTree(data1)
         d.merge(data2, **kwargs)
         return d.data

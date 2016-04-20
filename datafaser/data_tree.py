@@ -2,7 +2,8 @@
 Operations on plain deep data structures.
 """
 
-class Data:
+
+class DataTree:
     """
     Data object contains a free form data structure.
 

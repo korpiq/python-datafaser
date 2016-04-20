@@ -10,8 +10,8 @@ class RunnerTest(unittest.TestCase):
     files = path_to_test_data('json_files') + path_to_test_data('text_files')
 
     def test_construction_ok(self):
-        data = Data(create_plan_to_load_files(self.files))
-        self.assertIs(self.files, data.dig(self.files_key % 'plan'),
+        data_tree = DataTree(create_plan_to_load_files(self.files))
+        self.assertIs(self.files, data_tree.dig(self.files_key % 'plan'),
                       'Start plans to load filenames given to constructor')
 
     def test_run_plan_ok(self):

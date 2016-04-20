@@ -3,14 +3,14 @@ import datafaser.operations
 
 class Runner:
 
-    def __init__(self, data, operations=None):
+    def __init__(self, data_tree, operations=None):
         """
-        :param data: datafaser.data.Data object
+        :param data_tree: DataTree object
         :param operations: map of operation names to functions implementing them
         """
 
-        self.data = data
-        self.operations = operations or datafaser.operations.get_default_operations_map(data)
+        self.data = data_tree
+        self.operations = operations or datafaser.operations.get_default_operations_map(data_tree)
         self.phase_number = 0
 
     def load_and_run_all_plans(self):

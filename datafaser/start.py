@@ -2,7 +2,7 @@
 Builds first run plan to load files given as arguments.
 """
 
-from datafaser.data import Data
+from datafaser.data_tree import DataTree
 from datafaser.run import Runner
 from datafaser import formats
 
@@ -13,7 +13,7 @@ def create_runner_to_load(files):
     :return: datafaser.run.Runner configured to load given files
     """
 
-    return Runner(Data(create_plan_to_load_files(files)))
+    return Runner(DataTree(create_plan_to_load_files(files)))
 
 
 def create_plan_to_load_files(files):

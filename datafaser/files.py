@@ -6,9 +6,9 @@ class FileLoader:
 
     def __init__(self, data, format_register, default_format=None):
         """
-        :param data: datafaser.data.Data object to load into
+        :param data: DataTree object to load into
         :param default_format: string name of format to use for files without a registered filename extension
-        :param format_register: datafaser.formats.FormatRegister object providing file format modules
+        :param format_register: FormatRegister object providing file format modules
         """
 
         self.data = data
