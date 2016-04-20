@@ -1,5 +1,6 @@
 import os
 import unittest
+import tempfile
 
 from datafaser.data_tree import DataTree
 from datafaser.run import Runner
@@ -48,3 +49,14 @@ class RunnerTest(unittest.TestCase):
         expected = {'inner': {'target': self._read_yaml_result}}
         expected.update(self._minimum_required_settings)
         self.assertEquals(expected, self.data_tree.data, 'Load files from directory adds to specified place in data')
+
+    def test_run_load_data_to_files_ok(self):
+        base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+        with tempfile.TemporaryDirectory(dir=os.path.join(base_dir, 'local')) as temp_dir:
+            temp_file = os.path.join(temp_dir, 'file_writing_test.output')
+            plan = [{'load': {'from': [{'data': ['test.data']}], 'to': [{'files': {'json': temp_file}}]}}]
+            self.data_tree.data.update({'test': {'data': {'key': 'test value'}}})
+            Runner(self.data_tree).run_operation(plan)
+            expected = '{\n    "key": "test value"\n}\n'
+            with open(temp_file) as file:
+                self.assertEqual(expected, file.read(), 'Json written in expected format to file')
