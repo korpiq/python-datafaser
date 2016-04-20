@@ -18,13 +18,19 @@ class Loader:
 
         if 'from' in directives:
             for source in directives['from']:
-                if 'files' in source:
-                    if not isinstance(source, dict):
-                        raise TypeError('Not a dict: %s: "%s"' % (type(source), source))
-                    FileLoader(new_data, self.format_register).load(source['files'])
-                if 'data' in source:
-                    for key in source['data']:
-                        new_data.merge(data_tree.dig(key))
+                if not isinstance(source, dict):
+                    raise TypeError('Not a dictionary of sources to load from: %s: "%s"' % (type(source), source))
+                for source_type, source_values in source.items():
+                    if not isinstance(source_values, list):
+                        raise TypeError(
+                                'Not a list of %s sources to load from: %s: "%s"' %
+                                (source_type, type(source_values), source_values)
+                        )
+                    if source_type == 'files':
+                        FileLoader(new_data, self.format_register).load(source['files'])
+                    if source_type == 'data':
+                        for key in source['data']:
+                            new_data.merge(data_tree.dig(key))
 
         if 'to' in directives:
             self.save(data_tree, new_data, directives['to'])
