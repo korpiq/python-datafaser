@@ -8,7 +8,7 @@ class DataTreeAccessTest(unittest.TestCase):
         self.data_tree = datafaser.data_tree.DataTree({'foo': [{'bar': 'baz'}, {'quu': 'faz'}]})
 
     def test_dig_deep_ok(self):
-        self.assertEqual('faz', self.data_tree.dig('foo.1.quu'), 'Access nested dictionary and list elements')
+        self.assertEqual('faz', self.data_tree.reach('foo.1.quu'), 'Access nested dictionary and list elements')
 
     def test_dig_deep_missing(self):
         self.assertEqual('\'Missing "bar" in "foo.1"\'', self._miss('foo.1.bar'), 'Expect error for missing element')
@@ -29,6 +29,6 @@ class DataTreeAccessTest(unittest.TestCase):
 
     def _miss(self, *args, **kwargs):
         try:
-            self.data_tree.dig(*args, **kwargs)
+            self.data_tree.reach(*args, **kwargs)
         except KeyError as e:
             return str(e)

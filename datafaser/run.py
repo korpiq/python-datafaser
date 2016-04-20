@@ -18,9 +18,9 @@ class Runner:
         Runs plans as long as any are available at `datafaser.run.plan`.
         """
 
-        while len(self.data.dig('datafaser.run.plan')) > 0:
+        while len(self.data.reach('datafaser.run.plan')) > 0:
             self.phase_number += 1
-            run = self.data.dig('datafaser.run')
+            run = self.data.reach('datafaser.run')
             phase = run['plan'].pop()
             if isinstance(phase, dict) and len(phase) == 1:
                 run['phase'] = phase

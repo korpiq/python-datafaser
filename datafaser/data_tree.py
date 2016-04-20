@@ -18,10 +18,17 @@ class DataTree:
         self.data = data is None and {} or data
         self.separator = separator
 
-    def dig(self, key_path, create_containers=False):
-        return self._dig_or_bury(key_path, create_containers)[0]
+    def reach(self, key_path, create_containers=False):
+        """
+        Get an object from deep within this data tree.
 
-    def _dig_or_bury(self, key_path, create_containers=False, set_key=None, set_value=None):
+        :param key_path: a list of keys or a string with keys combined by separator characters (default is ".")
+        :param create_containers: whether to fail on or create missing keys on the path
+        :return: object at the point specified by key_path
+        """
+        return self._reach_to(key_path, create_containers)[0]
+
+    def _reach_to(self, key_path, create_containers=False, set_key=None, set_value=None):
         if isinstance(key_path, str):
             key_path = key_path.split(self.separator)
         data = self.data
@@ -51,7 +58,7 @@ class DataTree:
 
     def merge(self, add_data, key_path=None):
         if key_path and len(key_path):
-            my_data, key_path = self._dig_or_bury(key_path, create_containers=True)
+            my_data, key_path = self._reach_to(key_path, create_containers=True)
         else:
             my_data = self.data
             key_path = []
@@ -59,7 +66,7 @@ class DataTree:
         result = self._merge_node(add_data, my_data, {})
 
         if len(key_path):
-            self._dig_or_bury(key_path[:-1], set_key=key_path[-1], set_value=result)
+            self._reach_to(key_path[:-1], set_key=key_path[-1], set_value=result)
         else:
             self.data = result
 

@@ -11,7 +11,7 @@ def get_default_operations_map(data):
 
 class Loader:
     def __init__(self, data_tree):
-        self.format_register = FormatRegister(**data_tree.dig('datafaser.formats'))
+        self.format_register = FormatRegister(**data_tree.reach('datafaser.formats'))
 
     def load(self, data_tree, directives):
         new_data = DataTree({})
@@ -30,7 +30,7 @@ class Loader:
                         FileLoader(new_data, self.format_register).load(source['files'])
                     if source_type == 'data':
                         for key in source['data']:
-                            new_data.merge(data_tree.dig(key))
+                            new_data.merge(data_tree.reach(key))
 
         if 'to' in directives:
             self.save(data_tree, new_data, directives['to'])
