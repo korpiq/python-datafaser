@@ -9,7 +9,7 @@ class Runner:
         :param operations: map of operation names to functions implementing them
         """
 
-        self.data = data_tree
+        self.data_tree = data_tree
         self.operations = operations or datafaser.operations.get_default_operations_map(data_tree)
         self.phase_number = 0
 
@@ -18,9 +18,9 @@ class Runner:
         Runs plans as long as any are available at `datafaser.run.plan`.
         """
 
-        while len(self.data.reach('datafaser.run.plan')) > 0:
+        while len(self.data_tree.reach('datafaser.run.plan')) > 0:
             self.phase_number += 1
-            run = self.data.reach('datafaser.run')
+            run = self.data_tree.reach('datafaser.run')
             phase = run['plan'].pop()
             if isinstance(phase, dict) and len(phase) == 1:
                 run['phase'] = phase
@@ -44,6 +44,6 @@ class Runner:
             for operation in step.keys():
                 if operation in self.operations:
                     print('Run operation "%s"' % operation)
-                    self.operations[operation](self.data, step[operation])
+                    self.operations[operation](self.data_tree, step[operation])
                 else:
                     raise ValueError('Unknown operation: "%s"' % operation)
