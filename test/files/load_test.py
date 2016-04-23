@@ -12,7 +12,16 @@ class FileLoaderTest(unittest.TestCase):
     expected = {
         'yaml_files': {'a_list': ['foo', 'bar'], 'a_map': {'foo': 'bar'}},
         'json_files': {'a_list': ['foo', 'bar'], 'a_map': {'foo': 'bar'}},
-        'text_files': {'a_text': 'foo is bar\n'}
+        'text_files': {'a_text': 'foo is bar\n'},
+        'test_data_schema': {
+            "schema": {
+                "properties": {
+                    "a_list": { "type": "array" },
+                    "a_map": { "type": "object" },
+                    "a_text": { "type": "string" }
+                }
+            }
+        }
     }
 
     def setUp(self):

@@ -1,0 +1,38 @@
+{
+  "title": "datafaser schema",
+  "$schema": "https://kato.iki.fi/datafaser/schema/0.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["datafaser", "schema"],
+  "properties": {
+    "datafaser": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "run": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["plan"],
+          "properties": {
+            "arguments": {
+              "type": "array"
+            },
+            "plan": {
+              "type": "array",
+              "properties": {
+              }
+            },
+            "phase": {},
+            "done": {}
+          }
+        },
+        "formats":  {
+          "type": "object"
+        }
+      }
+    },
+    "schema": {
+      "type": "object"
+    }
+  }
+}

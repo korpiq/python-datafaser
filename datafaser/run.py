@@ -1,4 +1,7 @@
+import sys
+
 import datafaser.operations
+from datafaser.validation import Validator
 
 
 class Runner:
@@ -27,6 +30,7 @@ class Runner:
                 for phase_name, operations in phase.items():
                     print('Running phase #%d: "%s"' % (self.phase_number, phase_name))
                     self.run_operation(operations)
+                self.validate()
                 run['done'].append(phase)
                 del run['phase']
             else:
@@ -47,3 +51,12 @@ class Runner:
                     self.operations[operation](self.data_tree, step[operation])
                 else:
                     raise ValueError('Unknown operation: "%s"' % operation)
+
+    def validate(self):
+        validator = Validator(self.data_tree.reach('schema'))
+        result = validator.validate(self.data_tree.data)
+        errors = result.has_errors()
+        if errors:
+            for description in result.descriptions():
+                sys.stderr.write("%s\n" % description)
+            raise ValueError('%d errors after phase #%d' % (errors, self.phase_number))

@@ -1,6 +1,7 @@
 """
 Builds first run plan to load files given as arguments.
 """
+import os
 
 from datafaser.data_tree import DataTree
 from datafaser.run import Runner
@@ -43,7 +44,12 @@ def get_load_phase_for_files(files):
     return {'start': [{
         'load': {
             'from': [{
-                'files': files
+                'files': [get_schema_filepath()] + files
             }]
         }
     }]}
+
+
+def get_schema_filepath():
+    this_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(this_dir, 'data')

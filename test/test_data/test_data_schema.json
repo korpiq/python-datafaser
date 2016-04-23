@@ -1,0 +1,9 @@
+{
+  "schema": {
+    "properties": {
+      "a_list": { "type": "array" },
+      "a_map": { "type": "object" },
+      "a_text": { "type": "string" }
+    }
+  }
+}
