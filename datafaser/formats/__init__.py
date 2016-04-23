@@ -3,7 +3,7 @@ default_settings = {
         'yaml': 'datafaser.formats.yaml',
         'json': 'datafaser.formats.json',
         'text': 'datafaser.formats.text',
-        'ignore': 'datafaser.formats.ignore'
+        'ignore': None
     },
     'formats_by_filename_extension': {
         'ignore': 'ignore',
@@ -34,10 +34,17 @@ class FormatRegister:
         self.formats_by_filename_extension = formats_by_filename_extension
 
     def get_format_by_name(self, name):
+        """
+        :param name: string: name of format
+        :return: Any: module implementing the format or None to ignore it
+        """
+
         if name in self.format_handlers_by_name:
-            full_name = self.format_handlers_by_name[name]
-            namespace, relative_name = full_name.rsplit('.', 1)
-            return __import__(full_name, fromlist=[relative_name])
+            module_name = self.format_handlers_by_name[name]
+            if module_name is None:
+                return None
+            namespace, relative_name = module_name.rsplit('.', 1)
+            return __import__(module_name, fromlist=[relative_name])
         else:
             raise KeyError('Unknown format name: "%s"' % name)
 

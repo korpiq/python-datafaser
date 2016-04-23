@@ -1,4 +1,5 @@
 import os
+from copy import deepcopy
 import unittest
 from datafaser.files import FileLoader
 from datafaser.data_tree import DataTree
@@ -16,7 +17,7 @@ class FileLoaderTest(unittest.TestCase):
 
     def setUp(self):
         self.data_tree = DataTree({})
-        self.loader = FileLoader(self.data_tree, FormatRegister(**default_settings))
+        self.loader = FileLoader(self.data_tree, FormatRegister(**deepcopy(default_settings)))
 
     def test_loads_nothing_ok(self):
         self.loader.load([])
@@ -47,16 +48,16 @@ class FileLoaderTest(unittest.TestCase):
         self.assertIsNotNone(exception, 'Loading with unknown extension must fail')
 
     def test_loads_mixed_formats_skipping_extensionless_ok(self):
-        self.loader.format_register.register('datafaser.formats.ignore', None)
+        self.loader.format_register.register(None, 'extensionless', [None])
         self.loader.load(path_to_test_data())
-        self.assertEquals(self.expected, self.data_tree.data, 'Loader loads all supported types of data')
+        self.assertEquals(self.expected, self.data_tree.data, 'Loader ignores extensionless file when registered so')
 
     def test_loads_mixed_formats_with_default_parser_ok(self):
         self.loader.default_format = 'text'
         self.loader.load(path_to_test_data())
         expected = self.expected.copy()
         expected['ignored_files'] = {'filename_without_extension': 'This file name no extension, such wild.\n'}
-        self.assertEquals(expected, self.data_tree.data, 'Loader loads all supported types of data')
+        self.assertEquals(expected, self.data_tree.data, 'Loader loads extensionless file when registered as text')
 
     def test_load_with_absolute_path_fails(self):
         exception = None

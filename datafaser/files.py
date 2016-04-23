@@ -8,7 +8,7 @@ class FileLoader:
         """
         :param data: DataTree object to load into
         :param default_format: string name of format to use for files without a registered filename extension
-        :param format_register: FormatRegister object providing file format modules
+        :param format_register: datafaser.formats.FormatRegister object providing file format modules
         """
 
         self.data = data
@@ -36,9 +36,8 @@ class FileLoader:
 
     def _read_file_or_directory(self, absolute_source):
         if os.path.isfile(absolute_source):
-            _, extension = self._basename_and_extension(absolute_source)
-            with open(absolute_source) as stream:
-                self._read_file(stream, extension, None)
+            _, reader = self._get_bare_name_and_file_format_reader(absolute_source)
+            self._read_file(absolute_source, reader, None)
         elif os.path.isdir(absolute_source):
             self._read_directory(absolute_source)
         else:
@@ -48,24 +47,30 @@ class FileLoader:
         for path, dirs, filenames in os.walk(absolute_source):
             relative_path = path[len(absolute_source):]
             for filename in filenames:
-                bare_name, extension = self._basename_and_extension(filename)
+                bare_name, reader = self._get_bare_name_and_file_format_reader(filename)
                 key_path = relative_path.split(os.path.sep)[1:] + [bare_name]
-                with open(os.path.join(path, filename)) as stream:
-                    self._read_file(stream, extension, key_path)
+                self._read_file(os.path.join(path, filename), reader, key_path)
 
-    def _read_file(self, stream, extension, key_path):
+    def _read_file(self, filename_or_stream, reader, key_path):
+        if reader is not None:
+            with open(filename_or_stream) as stream:
+                parsed = reader.read(stream)
+                if parsed is not None:
+                    self.data.merge(parsed, key_path=key_path)
+
+    def _get_bare_name_and_file_format_reader(self, filename):
+        bare_name, extension = self._basename_and_extension(filename)
+
         if self.format_register.is_known_filename_extension(extension):
-            file_format = self.format_register.get_format_by_filename_extension(extension)
+            reader = self.format_register.get_format_by_filename_extension(extension)
         elif self.format_register.is_known_format_name(self.default_format):
-            file_format = self.format_register.get_format_by_name(self.default_format)
+            reader = self.format_register.get_format_by_name(self.default_format)
         else:
             raise FileExistsError(
-                    'No content format associated with filename extension "%s": "%s"' % (extension, stream.name)
+                    'No content format associated with filename extension "%s": "%s"' % (extension, filename)
             )
 
-        parsed = file_format.read(stream)
-        if parsed is not None:
-            self.data.merge(parsed, key_path=key_path)
+        return bare_name, reader
 
     @staticmethod
     def _basename_and_extension(filename):
