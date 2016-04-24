@@ -31,6 +31,8 @@ class Runner:
                     print('Running phase #%d: "%s"' % (self.phase_number, phase_name))
                     self.run_operation(operations)
                 self.validate()
+                if 'done' not in run:
+                    run['done'] = []
                 run['done'].append(phase)
                 del run['phase']
             else:
