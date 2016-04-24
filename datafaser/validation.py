@@ -44,10 +44,16 @@ class ValidationResult:
         results = []
         for error_type, error in tree.errors.items():
             results.append('%s at "%s" as "%s": %s' % (
-                error_type, '.'.join(error.absolute_path), '.'.join(error.absolute_schema_path), error.message
+                error_type,
+                self._deque_as_string(error.absolute_path),
+                self._deque_as_string(error.absolute_schema_path),
+                error.message
             ))
         for key in tree:
             node = tree[key]
             if isinstance(node, ErrorTree):
                 results += self._descriptions(node)
         return results
+
+    def _deque_as_string(self, items):
+        return '.'.join([str(item) for item in items])
