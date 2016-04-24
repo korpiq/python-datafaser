@@ -1,6 +1,7 @@
 {
   "title": "datafaser schema",
-  "$schema": "https://kato.iki.fi/datafaser/schema/0.0",
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "https://kato.iki.fi/datafaser/schema/0.0",
   "type": "object",
   "additionalProperties": false,
   "required": ["datafaser", "schema"],
@@ -8,6 +9,7 @@
     "datafaser": {
       "type": "object",
       "additionalProperties": false,
+      "required": ["run", "formats"],
       "properties": {
         "run": {
           "type": "object",
@@ -15,19 +17,117 @@
           "required": ["plan"],
           "properties": {
             "arguments": {
-              "type": "array"
+              "title": "given command line arguments",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "phase": {
+              "title": "Datafaser run phase",
+              "description": "Single name for a list of operations to perform before a validation checkpoint",
+              "id": "#phase",
+              "type": "object",
+              "additionalProperties": false,
+              "minProperties": 1,
+              "maxProperties": 1,
+              "patternProperties": {
+                "\\w{1,30}(( ?- ?| )\\w{1,30}){0,10}": {
+                  "type": "array",
+                  "items": {
+                    "title": "Datafaser operation",
+                    "type": "object",
+                    "minProperties": 1,
+                    "maxProperties": 1,
+                    "additionalProperties": false,
+                    "properties": {
+                      "load": {
+                        "title": "Datafaser load operation",
+                        "type": "object",
+                        "minProperties": 1,
+                        "maxProperties": 2,
+                        "additionalProperties": false,
+                        "properties": {
+                          "from": {
+                            "type": "array",
+                            "id": "#load_target",
+                            "items": {
+                              "type": "object",
+                              "minProperties": 1,
+                              "maxProperties": 1,
+                              "additionalProperties": false,
+                              "properties": {
+                                "files": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                },
+                                "data": {
+                                  "type": "array",
+                                  "items": {
+                                    "type": "string"
+                                  }
+                                }
+                              }
+                            }
+                          },
+                          "to": {
+                            "$ref": "#load_target"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
             },
             "plan": {
               "type": "array",
-              "properties": {
+              "items": {
+                "$ref": "#phase"
               }
             },
-            "phase": {},
-            "done": {}
+            "done": {
+              "type": "array",
+              "items": {
+                "$ref": "#phase"
+              }
+            }
           }
         },
         "formats":  {
-          "type": "object"
+          "description": "Parameters for datafaser.formats.FormatRegister",
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "format_handlers_by_name",
+            "formats_by_filename_extension"
+          ],
+          "properties": {
+            "format_handlers_by_name": {
+              "description": "A mapping of format names to names of associated format handler modules",
+              "type": "object",
+              "additionalProperties": false,
+              "minProperties": 1,
+              "patternProperties": {
+                "\\w{1,30}": {
+                  "type": ["string", "null"]
+                }
+              }
+            },
+            "formats_by_filename_extension": {
+              "description": "A mapping of filename extensions to associated format names",
+              "type": "object",
+              "additionalProperties": false,
+              "minProperties": 1,
+              "patternProperties": {
+                "\\w{1,30}": {
+                  "type": "string"
+                }
+              }
+            }
+          }
         }
       }
     },
