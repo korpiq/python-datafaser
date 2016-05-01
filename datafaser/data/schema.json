@@ -5,6 +5,78 @@
   "type": "object",
   "additionalProperties": false,
   "required": ["datafaser", "schema"],
+  "definitions": {
+    "phase": {
+      "title": "Datafaser run phase",
+      "description": "Single name for a list of operations to perform before a validation checkpoint",
+      "type": "object",
+      "additionalProperties": false,
+      "minProperties": 1,
+      "maxProperties": 1,
+      "patternProperties": {
+        "\\w{1,30}(( ?- ?| )\\w{1,30}){0,10}": {
+          "type": "array",
+          "items": {
+            "title": "Datafaser operation",
+            "type": "object",
+            "minProperties": 1,
+            "maxProperties": 1,
+            "additionalProperties": false,
+            "properties": {
+              "load": {
+                "title": "Datafaser load operation",
+                "type": "object",
+                "minProperties": 1,
+                "maxProperties": 2,
+                "additionalProperties": false,
+                "properties": {
+                  "from": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "minProperties": 1,
+                      "maxProperties": 1,
+                      "additionalProperties": false,
+                      "properties": {
+                        "files": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        },
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
+                  },
+                  "to": {
+                    "type": "object",
+                    "minProperties": 1,
+                    "additionalProperties": false,
+                    "properties": {
+                      "file": {
+                        "type": "string"
+                      },
+                      "data": {
+                        "type": "string"
+                      },
+                      "format": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
   "properties": {
     "datafaser": {
       "type": "object",
@@ -23,75 +95,17 @@
                 "type": "string"
               }
             },
-            "phase": {
-              "title": "Datafaser run phase",
-              "description": "Single name for a list of operations to perform before a validation checkpoint",
-              "id": "#phase",
-              "type": "object",
-              "additionalProperties": false,
-              "minProperties": 1,
-              "maxProperties": 1,
-              "patternProperties": {
-                "\\w{1,30}(( ?- ?| )\\w{1,30}){0,10}": {
-                  "type": "array",
-                  "items": {
-                    "title": "Datafaser operation",
-                    "type": "object",
-                    "minProperties": 1,
-                    "maxProperties": 1,
-                    "additionalProperties": false,
-                    "properties": {
-                      "load": {
-                        "title": "Datafaser load operation",
-                        "type": "object",
-                        "minProperties": 1,
-                        "maxProperties": 2,
-                        "additionalProperties": false,
-                        "properties": {
-                          "from": {
-                            "type": "array",
-                            "id": "#load_target",
-                            "items": {
-                              "type": "object",
-                              "minProperties": 1,
-                              "maxProperties": 1,
-                              "additionalProperties": false,
-                              "properties": {
-                                "files": {
-                                  "type": "array",
-                                  "items": {
-                                    "type": "string"
-                                  }
-                                },
-                                "data": {
-                                  "type": "array",
-                                  "items": {
-                                    "type": "string"
-                                  }
-                                }
-                              }
-                            }
-                          },
-                          "to": {
-                            "$ref": "#load_target"
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            },
+            "phase": { "$ref": "#/definitions/phase" },
             "plan": {
               "type": "array",
               "items": {
-                "$ref": "#phase"
+                "$ref": "#/definitions/phase"
               }
             },
             "done": {
               "type": "array",
               "items": {
-                "$ref": "#phase"
+                "$ref": "#/definitions/phase"
               }
             }
           }
