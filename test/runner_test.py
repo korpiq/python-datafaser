@@ -5,29 +5,24 @@ import tempfile
 
 from datafaser.data_tree import DataTree
 from datafaser.run import Runner
-from datafaser import formats
 from test.files import path_to_test_data
+from test import minimum_required_settings
 
 
 class RunnerTest(unittest.TestCase):
 
     _read_yaml_plan = [{'load': {'from': [{'files': path_to_test_data('yaml_files')}]}}]
     _read_yaml_result = {'a_list': ['foo', 'bar'], 'a_map': {'foo': 'bar'}}
-    _minimum_required_settings = {
-        'datafaser': {
-            'formats': formats.default_settings
-        }
-    }
 
     _read_schema_plan = [{'load': {'from': [{'files': path_to_test_data('test_data_schema.json')}]}}]
 
-    _runnable_configuration = deepcopy(_minimum_required_settings)
+    _runnable_configuration = deepcopy(minimum_required_settings)
     _runnable_configuration['datafaser']['run'] = {
         'plan': [{'test_phase': _read_yaml_plan + _read_schema_plan}]
     }
 
     def setUp(self):
-        self.data_tree = DataTree(deepcopy(self._minimum_required_settings))
+        self.data_tree = DataTree(deepcopy(minimum_required_settings))
         self.runner = Runner(self.data_tree)
         self.maxDiff = None
 
@@ -41,11 +36,11 @@ class RunnerTest(unittest.TestCase):
 
     def test_run_load_nothing_ok(self):
         Runner(self.data_tree).run_operation([{'load': {}}])
-        self.assertEquals(self._minimum_required_settings, self.data_tree.data, 'Empty load list does not add data')
+        self.assertEquals(minimum_required_settings, self.data_tree.data, 'Empty load list does not add data')
 
     def test_run_load_zero_files_ok(self):
         Runner(self.data_tree).run_operation([{'load': {'from': [{'files': []}]}}])
-        self.assertEquals(self._minimum_required_settings, self.data_tree.data, 'Empty load files list does not add data')
+        self.assertEquals(minimum_required_settings, self.data_tree.data, 'Empty load files list does not add data')
 
     def test_run_load_yaml_from_directory_ok(self):
         Runner(self.data_tree).run_operation(deepcopy(self._read_yaml_plan))
@@ -56,7 +51,7 @@ class RunnerTest(unittest.TestCase):
         plan = [{'load': {'from': self._read_yaml_plan[0]['load']['from'], 'to': [{'data': 'inner.target'}]}}]
         Runner(self.data_tree).run_operation(plan)
         expected = {'inner': {'target': self._read_yaml_result}}
-        expected.update(self._minimum_required_settings)
+        expected.update(minimum_required_settings)
         self.assertEquals(expected, self.data_tree.data, 'Load files from directory adds to specified place in data')
 
     def test_run_load_data_to_files_ok(self):

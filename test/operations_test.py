@@ -3,33 +3,28 @@ import unittest
 
 from datafaser.data_tree import DataTree
 from datafaser.operations import Loader
-from datafaser import formats
+from test import minimum_required_settings
 
 
 class LoadTest(unittest.TestCase):
-    _minimum_required_settings = {
-        'datafaser': {
-            'formats': formats.default_settings
-        }
-    }
+
+    def setUp(self):
+        self.loader = Loader(DataTree(copy.deepcopy(minimum_required_settings)))
 
     def test_load_without_directives_ok(self):
-        loader = Loader(DataTree(copy.deepcopy(self._minimum_required_settings)))
         target = {}
-        loader.load(DataTree(target), {})
+        self.loader.load(DataTree(target), {})
         self.assertEquals({}, target, 'Empty result for empy directives')
 
     def test_load_nothing_to_data_ok(self):
-        loader = Loader(DataTree(copy.deepcopy(self._minimum_required_settings)))
         target = {'There': 'Misty Mountain'}
-        loader.load(DataTree(target), {'to': [{'data': 'Back'}]})
+        self.loader.load(DataTree(target), {'to': [{'data': 'Back'}]})
         self.assertEquals({'There': 'Misty Mountain', 'Back': {}}, target,
                           'Loading nothing to nonexistent key creates the key with an empty dictionary')
 
     def test_load_from_data_to_data_ok(self):
-        loader = Loader(DataTree(copy.deepcopy(self._minimum_required_settings)))
         target = {'There': 'Misty Mountain'}
-        loader.load(DataTree(target), {'from': [{'data': ['There']}], 'to': [{'data': 'Back'}]})
+        self.loader.load(DataTree(target), {'from': [{'data': ['There']}], 'to': [{'data': 'Back'}]})
         self.assertEquals({'There': 'Misty Mountain', 'Back': 'Misty Mountain'}, target,
                           'Loading from data to data copies the source to the target')
 
@@ -50,8 +45,7 @@ class LoadTest(unittest.TestCase):
         self.assertIsInstance(exception, KeyError, 'Invalid from source causes type error')
 
     def _exception_from_loading_with(self, source, directives):
-        loader = Loader(DataTree(copy.deepcopy(self._minimum_required_settings)))
         try:
-            loader.load(DataTree(source), directives)
+            self.loader.load(DataTree(source), directives)
         except Exception as e:
             return e
