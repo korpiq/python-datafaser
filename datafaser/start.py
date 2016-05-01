@@ -26,7 +26,6 @@ def create_plan_to_load_files(files):
     return {
         'datafaser': {
             'run': {
-                'arguments': files,
                 'plan': [get_load_phase_for_files(files)],
                 'done': []
             },
