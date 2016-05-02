@@ -20,6 +20,7 @@ class Loader:
         """
 
         self.format_register = FormatRegister(**data_tree.reach('datafaser.formats'))
+        self.data_tree = data_tree
 
     def load(self, data_tree, directives):
         new_data = DataTree({})
@@ -38,9 +39,9 @@ class Loader:
                                 (source_type, type(source_values).__name__)
                         )
                     if source_type == 'files':
-                        FileLoader(new_data, self.format_register).load(source['files'])
+                        FileLoader(new_data, self.format_register, self._get_default_format()).load(source_values)
                     elif source_type == 'data':
-                        for key in source['data']:
+                        for key in source_values:
                             new_data.merge(data_tree.reach(key))
                     else:
                         raise KeyError('Unknown load source type: "%s"' % source_type)
@@ -50,19 +51,20 @@ class Loader:
         else:
             data_tree.merge(new_data.data)
 
-    def save(self, data_tree, new_data, targets):
-        if not isinstance(targets, list):
-            raise TypeError('Not a list of targets to save to: %s' % type(targets).__name__)
-        for target in targets:
-            if not isinstance(target, dict):
-                raise TypeError('Not a dictionary of target types to targets to save to: %s' % type(target).__name__)
-            if 'data' in target:
-                data_tree.merge(new_data.data, target['data'])
-            if 'files' in target:
-                writer = FileSaver(new_data.data, self.format_register)
-                for output_format, filename in target['files'].items():
-                    if not isinstance(output_format, str):
-                        raise TypeError('Not a name of an output format: %s' % type(output_format).__name__)
-                    if not isinstance(filename, str):
-                        raise TypeError('Not a filename to save to: %s' % type(filename).__name__)
-                    writer.save(filename, output_format)
+    def save(self, data_tree, new_data, target):
+        if not isinstance(target, dict):
+            raise TypeError('Not a dictionary of target types to targets to save to: %s' % type(target).__name__)
+        if 'data' in target:
+            data_tree.merge(new_data.data, target['data'])
+        if 'file' in target:
+            writer = FileSaver(new_data.data, self.format_register)
+            filename = target['file']
+            if not isinstance(filename, str):
+                raise TypeError('Not a filename to save to: %s' % type(filename).__name__)
+            output_format = target.get('format') or self._get_default_format()
+            if not isinstance(output_format, str):
+                raise ValueError('Missing format for file to write: "%s"' % filename)
+            writer.save(filename, output_format)
+
+    def _get_default_format(self):
+        return self.data_tree.reach('datafaser.run').get('options', {}).get('default-format')
