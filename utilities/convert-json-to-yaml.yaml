@@ -1,0 +1,16 @@
+# To convert json to yaml, run
+# `python datafaser utilities/convert-json-to-yaml.yaml < data.json > data.yaml`
+
+datafaser:
+  run:
+    options:
+      default-format: json
+    plan:
+    - "convert yaml to json":
+      - load:
+          from:
+          - files:
+            - "-"
+          to:
+            file: "-"
+            format: yaml
