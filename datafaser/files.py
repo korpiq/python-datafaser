@@ -28,7 +28,9 @@ class FileLoader:
 
         for source in sources:
             if source == '-':
-                self._read_file(sys.stdin, self.default_format, None)
+                if self.default_format is None:
+                    raise ValueError('Please specify default format to read from standard input.')
+                self._read_stream(sys.stdin, self.format_register.get_format_by_name(self.default_format), None)
             elif isinstance(source, str):
                 self._read_file_or_directory(_ensure_allowed_path(source))
             else:
@@ -51,12 +53,15 @@ class FileLoader:
                 key_path = relative_path.split(os.path.sep)[1:] + [bare_name]
                 self._read_file(os.path.join(path, filename), reader, key_path)
 
-    def _read_file(self, filename_or_stream, reader, key_path):
+    def _read_file(self, filename, reader, key_path):
         if reader is not None:
-            with open(filename_or_stream) as stream:
-                parsed = reader.read(stream)
-                if parsed is not None:
-                    self.data.merge(parsed, key_path=key_path)
+            with open(filename) as stream:
+                self._read_stream(stream, reader, key_path)
+
+    def _read_stream(self, stream, reader, key_path):
+        parsed = reader.read(stream)
+        if parsed is not None:
+            self.data.merge(parsed, key_path=key_path)
 
     def _get_bare_name_and_file_format_reader(self, filename):
         bare_name, extension = self._basename_and_extension(filename)
