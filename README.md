@@ -18,13 +18,15 @@ Testing
 Use
 ---
 
-    datafaser doc/examples/runplan.yaml
+    . local/bin/activate
+    python datafaser --help
 
-### Using existing plans
+For example, to output the schema of datafaser as yaml:
 
-See doc/using.md
+    python datafaser utilities/convert-json-to-yaml.yaml < datafaser/data/schema.json
 
-### Creating new plans
+Documentation
+-------------
 
-See doc/creating_plans.md
+Ideas in doc folder are currently a bit out of date.
 
