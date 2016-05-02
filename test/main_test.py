@@ -2,20 +2,22 @@ import os
 import sys
 import unittest
 import runpy
-import datafaser
+from datafaser import operations
 
 
 class MainTest(unittest.TestCase):
 
+    _schema_path_required_for_validation = 'schema.properties.datafaser.properties.run.properties.options.properties'
+
     def setUp(self):
         self.original_argv = sys.argv
         self.original_path = sys.path
-        self.original_run = datafaser.run
+        self.original_operations_provider = operations.get_default_operations_map
 
     def tearDown(self):
         sys.argv = self.original_argv
         sys.path = self.original_path
-        datafaser.run = self.original_run
+        operations.get_default_operations_map = self.original_operations_provider
 
     def test_starts_ok(self):
         self.got_files = None
@@ -29,9 +31,16 @@ class MainTest(unittest.TestCase):
         self.assertIn(base_dir, sys.path, 'main adds datafaser to path')
 
     def _run_main(self):
-        datafaser.run = self._mock_start
+        operations.get_default_operations_map = self._mock_operations_map
         sys.argv = ['some', 'strings']
         runpy.run_module('datafaser', run_name='__main__')
 
-    def _mock_start(self, files):
-        self.got_files = files
+    def _mock_operations_map(self, _):
+        return {'load': self._mock_load}
+
+    def _mock_load(self, data_tree, directives):
+        self.got_files = directives['from'][0]['files']
+        self._create_schema_required_for_validation(data_tree)
+
+    def _create_schema_required_for_validation(self, data_tree):
+        data_tree.reach(self._schema_path_required_for_validation, create_containers=True)

@@ -8,16 +8,25 @@ from datafaser.run import Runner
 from datafaser import formats
 
 
-def create_runner_to_load(files):
+def initialize_runner():
+    """
+    :return: datafaser.run.Runner instance complete with datafaser schema
+    """
+    runner = create_runner_to_load([get_schema_filepath()], 'load datafaser schema')
+    runner.run_next_phase()
+    return runner
+
+
+def create_runner_to_load(files, phase_name):
     """
     :param files: list of paths to files or directories to load as data
     :return: datafaser.run.Runner configured to load given files
     """
 
-    return Runner(DataTree(create_plan_to_load_files(files)))
+    return Runner(DataTree(create_plan_to_load_files(files, phase_name)))
 
 
-def create_plan_to_load_files(files):
+def create_plan_to_load_files(files, phase_name):
     """
     :param files: list of paths to files or directories to load as data
     :return: data structure containing plan to load files given as arguments
@@ -26,7 +35,7 @@ def create_plan_to_load_files(files):
     return {
         'datafaser': {
             'run': {
-                'plan': [get_load_phase_for_files(files)],
+                'plan': [get_load_phase_for_files(files, phase_name)],
                 'done': []
             },
             'formats': formats.default_settings
@@ -34,16 +43,16 @@ def create_plan_to_load_files(files):
     }
 
 
-def get_load_phase_for_files(files):
+def get_load_phase_for_files(files, phase_name):
     """
     :param files: list of paths to files or directories to load as data
     :return: data structure containing run plan phase to load files given as arguments
     """
 
-    return {'start': [{
+    return {phase_name: [{
         'load': {
             'from': [{
-                'files': [get_schema_filepath()] + files
+                'files': files
             }]
         }
     }]}

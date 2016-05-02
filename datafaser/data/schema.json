@@ -88,6 +88,33 @@
           "additionalProperties": false,
           "required": ["plan"],
           "properties": {
+            "options": {
+              "title": "Command line settings guiding datafaser",
+              "type": "object",
+              "properties": {
+                "default-format": {
+                  "title": "Format for reading and writing unrecognized files, such as json, yaml, text, or skip.",
+                  "type": "string"
+                },
+                "log-level": {
+                  "title": "One of DEBUG, INFO (default), WARNING, ERROR, or CRITICAL.",
+                  "type": "string",
+                  "enum": ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"]
+                },
+                "log-file": {
+                  "title": "Name of file to log to instead of standard error.",
+                  "type": "string"
+                },
+                "syslog": {
+                  "title": "Send messages to system log.",
+                  "type": "boolean"
+                },
+                "help": {
+                  "title": "Explain usage instead of normal operation.",
+                  "type": "boolean"
+                }
+              }
+            },
             "phase": { "$ref": "#/definitions/phase" },
             "plan": {
               "type": "array",
