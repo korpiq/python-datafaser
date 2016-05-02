@@ -5,6 +5,11 @@ Datafaser collects and generates data, then fills in templates to generate files
 
 Results of each phase are checked against data schemas and content descriptions.
 
+Requirements
+------------
+
+ - Python 3.5
+
 Setup
 -----
 
