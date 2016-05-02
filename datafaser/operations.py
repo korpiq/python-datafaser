@@ -3,9 +3,9 @@ from datafaser.files import FileLoader, FileSaver
 from datafaser.formats import FormatRegister
 
 
-def get_default_operations_map(data):
+def get_default_operations_map(data_tree):
     return {
-        'load': Loader(data).load
+        'load': Loader(data_tree).load
     }
 
 
