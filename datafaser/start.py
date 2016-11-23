@@ -23,22 +23,27 @@ def create_runner_to_load(files, phase_name):
     :return: datafaser.run.Runner configured to load given files
     """
 
-    return Runner(DataTree(create_plan_to_load_files(files, phase_name)))
+    return Runner(DataTree(create_datafaser_structure_to_load_files(files, phase_name)))
 
 
-def create_plan_to_load_files(files, phase_name):
+def create_datafaser_structure_to_load_files(files, phase_name):
     """
     :param files: list of paths to files or directories to load as data
     :return: data structure containing plan to load files given as arguments
     """
 
+    result = create_plan_to_load_files(files, phase_name)
+    result['datafaser']['run']['done'] = []
+    result['datafaser']['formats'] = formats.default_settings
+    return result
+
+
+def create_plan_to_load_files(files, phase_name):
     return {
         'datafaser': {
             'run': {
                 'plan': [get_load_phase_for_files(files, phase_name)],
-                'done': []
-            },
-            'formats': formats.default_settings
+            }
         }
     }
 

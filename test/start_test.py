@@ -14,7 +14,7 @@ class RunnerTest(unittest.TestCase):
     )
 
     def test_construction_ok(self):
-        data_tree = DataTree(create_plan_to_load_files(self.files, 'test loading files'))
+        data_tree = DataTree(create_datafaser_structure_to_load_files(self.files, 'test loading files'))
         self.assertEquals(
                 data_tree.reach(self.files_key % 'plan'),
                 self.files,
