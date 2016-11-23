@@ -27,6 +27,7 @@ class FileLoaderTest(unittest.TestCase):
     def setUp(self):
         self.data_tree = DataTree({})
         self.loader = FileLoader(self.data_tree, FormatRegister(**deepcopy(default_settings)))
+        self.maxDiff = None
 
     def test_loads_nothing_ok(self):
         self.loader.load([])
