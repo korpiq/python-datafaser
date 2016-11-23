@@ -3,11 +3,13 @@ default_settings = {
         'yaml': 'datafaser.formats.yaml',
         'json': 'datafaser.formats.json',
         'text': 'datafaser.formats.text',
+        'xml': 'datafaser.formats.xml',
         'ignore': None
     },
     'formats_by_filename_extension': {
         'ignore': 'ignore',
         'json': 'json',
+        'xml': 'xml',
         'yaml': 'yaml',
         'yml': 'yaml',
         'skip': 'ignore',

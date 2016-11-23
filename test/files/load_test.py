@@ -13,6 +13,30 @@ class FileLoaderTest(unittest.TestCase):
         'yaml_files': {'a_list': ['foo', 'bar'], 'a_map': {'foo': 'bar'}},
         'json_files': {'a_list': ['foo', 'bar'], 'a_map': {'foo': 'bar'}},
         'text_files': {'a_text': 'foo is bar\n'},
+        'xml_files': {
+            'document': {
+                'XmlRootNode': {
+                    'attributes': {'xmlRootNodeAttribute': 'xml root node attribute value'},
+                    'content': [
+                        '\n  ',
+                        {
+                            'XmlNode': {
+                                'attributes': {'xmlNodeAttribute': 'xml node attribute value'},
+                                'content': ['\n    Text in XML node\n  ']
+                            }
+                        },
+                        '\n  Text between nodes\n  ',
+                        {
+                            'XmlNode': {
+                                'attributes': {'xmlNodeAttribute': 'another node attribute value'},
+                                'content': []
+                            }
+                        },
+                        '\n  Text after nodes\n'
+                    ]
+                }
+            }
+        },
         'test_data_schema': {
             "schema": {
                 "properties": {

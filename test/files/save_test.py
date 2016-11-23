@@ -25,6 +25,12 @@ class FileWriterStdoutTest(unittest.TestCase):
         expected = '{\n    "foo": [\n        "bar"\n    ]\n}\n'
         self.assertEqual(expected, self.buffer.getvalue(), 'Json written in expected format to STDOUT')
 
+    def test_write_xml_to_stdout_ok(self):
+        data = { 'Foo': { 'attributes': { 'key': 'value' }, 'content': [ '\nbody text\n' ] } }
+        self.__output_as(data, 'xml')
+        expected = '<Foo key="value">\nbody text\n</Foo>\n'
+        self.assertEqual(expected, self.buffer.getvalue(), 'XML written in expected format to STDOUT')
+
     def test_write_text_to_stdout_ok(self):
         expected = 'Hello there!'
         self.__output_as(expected, 'text')
