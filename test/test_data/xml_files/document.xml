@@ -1,0 +1,8 @@
+<XmlRootNode xmlRootNodeAttribute="xml root node attribute value">
+  <XmlNode xmlNodeAttribute="xml node attribute value">
+    Text in XML node
+  </XmlNode>
+  Text between nodes
+  <XmlNode xmlNodeAttribute="another node attribute value" />
+  Text after nodes
+</XmlRootNode>
