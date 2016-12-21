@@ -1,4 +1,4 @@
-virtualenv local
+virtualenv -p $(which python3) local
 . local/bin/activate
 pip install -r requirements.txt
 
