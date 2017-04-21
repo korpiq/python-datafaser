@@ -3,6 +3,6 @@
     Text in XML node
   </XmlNode>
   Text between nodes
-  <XmlNode xmlNodeAttribute="another node attribute value" />
+  <XmlNode/>
   Text after nodes
 </XmlRootNode>

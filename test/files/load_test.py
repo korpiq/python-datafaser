@@ -27,10 +27,7 @@ class FileLoaderTest(unittest.TestCase):
                         },
                         '\n  Text between nodes\n  ',
                         {
-                            'XmlNode': {
-                                'attributes': {'xmlNodeAttribute': 'another node attribute value'},
-                                'content': []
-                            }
+                            'XmlNode': {}
                         },
                         '\n  Text after nodes\n'
                     ]

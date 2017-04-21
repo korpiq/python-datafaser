@@ -1,5 +1,32 @@
 import xml.etree.ElementTree as ET
 
+help_topic = 'XML data representation'
+help_text = '''
+Each XML element is represented as a map with only one key, the element name,
+pointing to a map with up to two optional keys:
+  - 'attributes' points to a map containing the XML element's attributes
+  - 'content' points to a list of strings and XML element representations
+    in same order as in the XML inside the element.
+
+For instance, XML
+
+    <rootNode attr="value">
+      text before subnode
+      <subNode/>
+      text after subnode
+    </rootNode>
+
+is represented as
+
+    rootNode:
+      attributes:
+        attr: value
+      content:
+      - text before subnode
+      - subNode: {}
+      - text after subnode
+'''
+
 
 def read(stream):
     stream_content = ''.join(stream.read())
@@ -9,8 +36,6 @@ def read(stream):
 
 def write(data, stream):
     root_element = structure_to_element(data)
-    #root_element = ET.Element('Foo', attrib={'key':'value'})
-    #root_element.text = '\nbody text\n'
     xml_string = ET.tostring(root_element, encoding='unicode')
     stream.write(xml_string)
     stream.write('\n')
@@ -25,11 +50,15 @@ def element_to_structure(element):
             content.append(element_to_structure(subelement))
             if subelement.tail:
                 content.append(subelement.tail)
+
+        tag = {}
+        if content:
+           tag['content'] = content
+        if element.attrib:
+           tag['attributes'] = element.attrib
+
         return {
-            element.tag: {
-                'attributes': element.attrib,
-                'content': content
-            }
+            element.tag: tag
         }
     else:
         return element
@@ -44,13 +73,19 @@ def structure_to_element(data_dict):
 def build_xml(data_dict, builder):
     tag_name = list(data_dict.keys())[0]
     tag = data_dict[tag_name]
-    builder.start(tag_name, tag['attributes'])
+    if 'attributes' in tag:
+        attributes = tag['attributes']
+    else:
+        attributes = {}
 
-    for item in tag['content']:
-        if isinstance(item, dict):
-            structure_to_element(item, builder)
-        else:
-            builder.data(item)
+    builder.start(tag_name, attributes)
+
+    if 'content' in tag:
+        for item in tag['content']:
+            if isinstance(item, dict):
+                structure_to_element(item, builder)
+            else:
+                builder.data(item)
 
     builder.end(tag_name)
 
