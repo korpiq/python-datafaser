@@ -10,6 +10,13 @@ from datafaser.formats import FormatRegister, default_settings
 class FileLoaderTest(unittest.TestCase):
 
     expected = {
+        'csv_files': {
+            'csv_data': [
+                ["first element of first row", "last element of first row"],
+                ['1', '2', '3', ''],
+                ["first element of last row", "last element of last row"]
+            ]
+        },
         'yaml_files': {'a_list': ['foo', 'bar'], 'a_map': {'foo': 'bar'}},
         'json_files': {'a_list': ['foo', 'bar'], 'a_map': {'foo': 'bar'}},
         'text_files': {'a_text': 'foo is bar\n'},

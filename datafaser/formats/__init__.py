@@ -1,5 +1,6 @@
 default_settings = {
     'format_handlers_by_name': {
+        'csv': 'datafaser.formats.csv',
         'yaml': 'datafaser.formats.yaml',
         'json': 'datafaser.formats.json',
         'text': 'datafaser.formats.text',
@@ -8,6 +9,7 @@ default_settings = {
     },
     'formats_by_filename_extension': {
         'ignore': 'ignore',
+        'csv': 'csv',
         'json': 'json',
         'xml': 'xml',
         'yaml': 'yaml',
