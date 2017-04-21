@@ -109,6 +109,10 @@
                   "title": "Send messages to system log.",
                   "type": "boolean"
                 },
+                "help-on": {
+                  "title": "Explain a topic such as XML in detail.",
+                  "type": "string"
+                },
                 "help": {
                   "title": "Explain usage instead of normal operation.",
                   "type": "boolean"

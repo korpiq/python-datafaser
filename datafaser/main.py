@@ -50,17 +50,58 @@ class Main:
             value = options_schema[name]['type'] == 'boolean' or option[1]
             self.options[name] = value
 
+        if 'help-on' in self.options:
+            self.help_on(self.options['help-on'])
+            sys.exit(1)
+
         if 'help' in self.options:
             self.usage(options_schema)
             sys.exit(1)
 
         return arguments
 
+    def help_on(self, topic):
+        topicpath = topic.split('.')
+        module = __import__('datafaser.' + topic)
+        for submodulename in topicpath:
+            module = module.__dict__[submodulename]
+
+        helps = []
+        if 'help_topic' in module.__dict__:
+            helps.append(module.help_topic.strip())
+        if 'help_text' in module.__dict__:
+            helps.append(module.help_text.strip())
+
+        if helps:
+            sys.stderr.write('%s\n' % '\n\n'.join(helps))
+        else:
+            sys.stderr.write('No help available for requested topic.\n')
+
+    def help_topics(self):
+        sys.stderr.write('\nHelp Topics:\n')
+        this_dir = os.path.dirname(__file__)
+        for dirname, dirs, files in os.walk(this_dir):
+             for filename in files:
+                 if filename.endswith('.py'):
+                     modulepath = list(filter(lambda n: n, dirname[len(this_dir)+1:].split(os.sep)))
+                     if not filename.startswith('__'):
+                         modulepath.append(filename[:len(filename)-3])
+                     modulename = '.'.join(modulepath)
+
+                     module = __import__('.'.join(['datafaser'] + modulepath))
+
+                     for submodulename in modulepath:
+                          module = module.__dict__[submodulename]
+
+                     if 'help_topic' in module.__dict__:
+                         sys.stderr.write("  %s\t%s\n" % (modulename, module.help_topic))
+
     def usage(self, options_schema):
         sys.stderr.write(usage % self.command_line[0])
         for key, schema in sorted(options_schema.items(), key=lambda item: item[0]):
             value = schema['type'] != 'boolean' and '=' + schema['type'].upper() or ''
             sys.stderr.write("  --%-22s  %s\n" % (key + value, schema['title']))
+        self.help_topics()
 
     def list_long_options(self, options_schema):
         for key, schema in options_schema.items():
