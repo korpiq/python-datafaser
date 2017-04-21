@@ -8,7 +8,7 @@ Results of each phase are checked against data schemas and content descriptions.
 Requirements
 ------------
 
- - Python 3.5
+ - Python 3.6
 
 Setup
 -----
