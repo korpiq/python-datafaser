@@ -1,0 +1,5 @@
+python3 -m venv local
+source local/bin/activate
+pip install -e .[test]
+pip uninstall -y datafaser
+

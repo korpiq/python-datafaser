@@ -1,5 +1,0 @@
-jsonschema >= 2.5.1
-PyYAML >= 3.11
-jinja2 >= 2.6
-nose-cov >= 1.6
-

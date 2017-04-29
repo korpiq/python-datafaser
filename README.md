@@ -13,7 +13,7 @@ Requirements
 Setup
 -----
 
-    . setup
+    . setup-development
 
 Testing
 -------
