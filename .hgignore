@@ -3,3 +3,7 @@ syntax: regexp
 ^local/
 .*/__pycache__/
 .coverage
+.eggs/
+datafaser.egg-info/
+build/
+dist/
