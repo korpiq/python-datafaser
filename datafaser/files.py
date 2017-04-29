@@ -110,8 +110,13 @@ class FileSaver:
 
 def _ensure_allowed_path(filename):
     full_path = os.path.abspath(filename)
+
     current_dir = os.path.abspath(os.curdir)
     if full_path.startswith(current_dir):
+        return full_path
+
+    datafaser_path = os.path.dirname(os.path.abspath(__file__))
+    if full_path.startswith(datafaser_path):
         return full_path
 
     raise FileNotFoundError(
