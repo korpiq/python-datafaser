@@ -10,12 +10,5 @@ if base_dir not in sys.path:
 
 
 if __name__ == '__main__':
-    logging.basicConfig(level='WARN', format='Unconfigured %(name)s %(levelname)s: %(message)s')
-    try:
-        from datafaser.main import Main
-        Main(sys.argv).run_with_command_line()
-    except Exception as e:
-        logging.getLogger(sys.argv[0]).fatal(
-                '%s: %s\n' % (e.__class__.__name__, str(e)),
-                exc_info=os.environ.get('DATAFASER_STACKTRACE', 0))
-        sys.exit(2)
+    from datafaser.main import main
+    main(sys.argv)
