@@ -1,3 +1,5 @@
+import logging
+
 import os
 import sys
 
@@ -14,6 +16,7 @@ class FileLoader:
         self.data = data
         self.default_format = default_format
         self.format_register = format_register
+        self.logger = logging.getLogger(__name__)
 
     def load(self, sources):
         """
@@ -54,7 +57,10 @@ class FileLoader:
                 self._read_file(os.path.join(path, filename), reader, key_path)
 
     def _read_file(self, filename, reader, key_path):
-        if reader is not None:
+        if reader is None:
+            self.logger.info('No reader for file: "%s" at: "%s"' % (filename, key_path))
+        else:
+            self.logger.info('Read %s from: "%s" to: "%s"' % (reader.__name__, filename, key_path))
             with open(filename) as stream:
                 self._read_stream(stream, reader, key_path)
 
@@ -92,12 +98,15 @@ class FileSaver:
 
         self.data = data
         self.format_register = format_register
+        self.logger = logging.getLogger(__name__)
 
     def save(self, filename, output_format):
         """
         :param filename: string: path and name to file to write
         :param output_format: string: name of format to output
         """
+
+        self.logger.info('Save %s to: "%s"' % (output_format, filename))
 
         file_format = self.format_register.get_format_by_name(output_format)
 

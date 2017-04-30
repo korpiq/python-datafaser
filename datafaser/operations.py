@@ -1,3 +1,5 @@
+import logging
+
 from datafaser.data_tree import DataTree
 from datafaser.files import FileLoader, FileSaver
 from datafaser.formats import FormatRegister
@@ -21,6 +23,7 @@ class Loader:
 
         self.format_register = FormatRegister(**data_tree.reach('datafaser.formats'))
         self.data_tree = data_tree
+        self.logger = logging.getLogger(__name__)
 
     def load(self, data_tree, directives):
         new_data = DataTree({})
@@ -54,13 +57,19 @@ class Loader:
     def save(self, data_tree, new_data, target):
         if not isinstance(target, dict):
             raise TypeError('Not a dictionary of target types to targets to save to: %s' % type(target).__name__)
+
         if 'data' in target:
+            self.logger.info('Store read data at: "%s"' % target['data'])
             data_tree.merge(new_data.data, target['data'])
+
         if 'file' in target:
+            self.logger.info('Save read data to: "%s"' % target['file'])
+
             writer = FileSaver(new_data.data, self.format_register)
             filename = target['file']
             if not isinstance(filename, str):
                 raise TypeError('Not a filename to save to: %s' % type(filename).__name__)
+
             output_format = target.get('format') or self._get_default_format()
             if not isinstance(output_format, str):
                 raise ValueError('Missing format for file to write: "%s"' % filename)
