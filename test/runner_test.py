@@ -56,7 +56,7 @@ class RunnerTest(unittest.TestCase):
 
     def test_run_load_data_to_files_ok(self):
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-        with tempfile.TemporaryDirectory(dir=os.path.join(base_dir, 'local')) as temp_dir:
+        with tempfile.TemporaryDirectory(dir=os.path.join(base_dir, 'datafaser-dev-env')) as temp_dir:
             temp_file = os.path.join(temp_dir, 'file_writing_test.output')
             plan = [{'load': {'from': [{'data': ['test.data']}], 'to': {'file': temp_file, 'format': 'json'}}}]
             self.data_tree.data.update({'test': {'data': {'key': 'test value'}}})
