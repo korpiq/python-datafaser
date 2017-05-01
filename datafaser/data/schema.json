@@ -70,6 +70,24 @@
                     }
                   }
                 }
+              },
+              "save": {
+                "title": "Datafaser save operation",
+                "type": "object",
+                "minProperties": 0,
+                "maxProperties": 3,
+                "additionalProperties": false,
+                "properties": {
+                  "branch": {
+                    "type": "string"
+                  },
+                  "file": {
+                    "type": "string"
+                  },
+                  "format": {
+                    "type": "string"
+                  }
+                }
               }
             }
           }

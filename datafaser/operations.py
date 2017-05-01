@@ -7,7 +7,8 @@ from datafaser.formats import FormatRegister
 
 def get_default_operations_map(data_tree):
     return {
-        'load': Loader(data_tree).load
+        'load': Loader(data_tree).load,
+        'save': Loader(data_tree).save
     }
 
 
@@ -50,11 +51,30 @@ class Loader:
                         raise KeyError('Unknown load source type: "%s"' % source_type)
 
         if 'to' in directives:
-            self.save(data_tree, new_data, directives['to'])
+            self._save_new_data(data_tree, new_data, directives['to'])
         else:
             data_tree.merge(new_data.data)
 
-    def save(self, data_tree, new_data, target):
+    def save(self, data_tree, directives):
+        branch = directives.get('branch')
+        if branch:
+            data = data_tree.reach(branch)
+        else:
+            data = data_tree.data
+        writer = FileSaver(data, self.format_register)
+
+        filename = directives.get('file', '-')
+        self.logger.info('Save data at "%s" to file: "%s"' % (branch, filename))
+        if not isinstance(filename, str):
+            raise TypeError('Not a filename to save to: %s' % type(filename).__name__)
+
+        output_format = directives.get('format') or self._get_default_format()
+        if not isinstance(output_format, str):
+            raise ValueError('Missing format for file to write: "%s"' % filename)
+
+        writer.save(filename, output_format)
+
+    def _save_new_data(self, data_tree, new_data, target):
         if not isinstance(target, dict):
             raise TypeError('Not a dictionary of target types to targets to save to: %s' % type(target).__name__)
 
