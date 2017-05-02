@@ -76,14 +76,18 @@ class RunnerTest(unittest.TestCase):
         )
 
     def test_run_plan_ok(self):
-        expected = deepcopy(self._runnable_configuration['datafaser']['run']['plan'])
-        runner = Runner(DataTree(deepcopy(self._runnable_configuration)))
+        configuration = deepcopy(self._runnable_configuration)
+        plan = configuration['datafaser']['run']['plan']
+        plan += [{'last step': self._read_schema_plan}]
+
+        expected = deepcopy(plan)
+        runner = Runner(DataTree(configuration))
 
         runner.load_and_run_all_plans()
 
         self.assertEquals('bar', runner.data_tree.reach('a_map.foo'), 'Run loads data')
         self.assertEquals([], runner.data_tree.reach('datafaser.run.plan'), 'Run empties plan')
-        self.assertEquals(expected, runner.data_tree.reach('datafaser.run.done'), 'Run empties plan')
+        self.assertEquals(expected, runner.data_tree.reach('datafaser.run.done'), 'Run results in plan done')
 
     def test_run_empty_phase_fails(self):
         plan = deepcopy(self._runnable_configuration)

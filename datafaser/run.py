@@ -35,7 +35,7 @@ class Runner:
 
         self.phase_number += 1
         run = self.data_tree.reach('datafaser.run')
-        phase = run['plan'].pop()
+        phase = run['plan'].pop(0)
         if isinstance(phase, dict) and len(phase) == 1:
             run['phase'] = phase
             for phase_name, operations in phase.items():
