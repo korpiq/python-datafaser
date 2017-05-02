@@ -18,9 +18,10 @@ class LoadTest(unittest.TestCase):
 
     def test_load_nothing_to_data_ok(self):
         target = {'There': 'Misty Mountain'}
+        back = target.copy()
         self.loader.load(DataTree(target), {'to': {'data': 'Back'}})
-        self.assertEquals({'There': 'Misty Mountain', 'Back': {}}, target,
-                          'Loading nothing to nonexistent key creates the key with an empty dictionary')
+        self.assertEquals({'There': 'Misty Mountain', 'Back': back}, target,
+                          'Loading nothing to nonexistent key copies whole data to target')
 
     def test_load_from_data_to_data_ok(self):
         target = {'There': 'Misty Mountain'}
