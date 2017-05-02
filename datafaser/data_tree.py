@@ -26,7 +26,10 @@ class DataTree:
         :param create_containers: whether to fail on or create missing keys on the path
         :return: object at the point specified by key_path
         """
-        return self._reach_to(key_path, create_containers)[0]
+        if key_path and len(key_path):
+            return self._reach_to(key_path, create_containers)[0]
+        else:
+            return self.data
 
     def _reach_to(self, key_path, create_containers=False, set_key=None, set_value=None):
         if isinstance(key_path, str):
