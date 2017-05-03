@@ -71,21 +71,35 @@
                   }
                 }
               },
-              "save": {
-                "title": "Datafaser save operation",
+              "table": {
+                "title": "Datafaser table conversion operation",
                 "type": "object",
-                "minProperties": 0,
-                "maxProperties": 3,
                 "additionalProperties": false,
+                "required": ["from", "to"],
                 "properties": {
-                  "branch": {
-                    "type": "string"
+                  "from": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "table": {
+                        "type": "object",
+                        "additionalProperties": false,
+                        "properties": {
+                          "branch": {
+                            "type": "string"
+                          }
+                        }
+                      }
+                    }
                   },
-                  "file": {
-                    "type": "string"
-                  },
-                  "format": {
-                    "type": "string"
+                  "to": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "branch": {
+                        "type": "string"
+                      }
+                    }
                   }
                 }
               }

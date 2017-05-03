@@ -3,7 +3,16 @@
     "properties": {
       "a_list": { "type": "array" },
       "a_map": { "type": "object" },
-      "a_text": { "type": "string" }
+      "a_text": { "type": "string" },
+      "table": {
+        "type": "array",
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
     }
   }
 }

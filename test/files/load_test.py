@@ -11,7 +11,7 @@ class FileLoaderTest(unittest.TestCase):
 
     expected = {
         'csv_files': {
-            'csv_data': [
+            'table': [
                 ["first element of first row", "last element of first row"],
                 ['1', '2', '3', ''],
                 ["first element of last row", "last element of last row"]
@@ -46,7 +46,16 @@ class FileLoaderTest(unittest.TestCase):
                 "properties": {
                     "a_list": { "type": "array" },
                     "a_map": { "type": "object" },
-                    "a_text": { "type": "string" }
+                    "a_text": { "type": "string" },
+                    "table": {
+                        "type": "array",
+                        "items": {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        }
+                    }
                 }
             }
         }
