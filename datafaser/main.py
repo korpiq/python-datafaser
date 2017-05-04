@@ -94,7 +94,7 @@ class Main:
                           module = module.__dict__[submodulename]
 
                      if 'help_topic' in module.__dict__:
-                         sys.stderr.write("  %s\t%s\n" % (modulename, module.help_topic))
+                         sys.stderr.write("  %-24s  %s\n" % (modulename, module.help_topic))
 
     def usage(self, options_schema):
         sys.stderr.write(usage % self.command_line[0])
