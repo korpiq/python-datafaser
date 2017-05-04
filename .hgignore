@@ -2,7 +2,7 @@ syntax: regexp
 
 ^datafaser-dev-env/
 .*/__pycache__/
-.coverage
+.coverage$
 .eggs/
 datafaser.egg-info/
 build/
