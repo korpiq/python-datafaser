@@ -54,12 +54,26 @@ class DataTree:
                 raise KeyError('No container at "%s" trying to get "%s"' %
                     (self.separator.join(key_path[:index]), self.separator.join(key_path)))
 
-        if set_key:
-            data[set_key] = set_value
+        if set_key is not None:
+            if isinstance(data, list):
+                int_key = int(set_key)
+                if int_key == len(data):
+                    data.append(set_value)
+                else:
+                    data[int_key] = set_value
+            else:
+                data[set_key] = set_value
 
         return data, key_path
 
     def merge(self, add_data, key_path=None):
+        """
+        Merge given data to tree at given branch. Creates new dictionaries as necessary to reach the branch.
+
+        :param add_data: data to add
+        :param key_path: address of branch or None to merge at top level
+        """
+
         if key_path and len(key_path):
             my_data, key_path = self._reach_to(key_path, create_containers=True)
         else:
