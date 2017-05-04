@@ -5,6 +5,42 @@ from datafaser.files import FileLoader, FileSaver
 from datafaser.formats import FormatRegister
 
 
+help_topic = 'Load operation'
+help_text = '''
+Load data between files and branches of data tree in memory:
+
+    - "Load data from files":
+      - load:
+          from:
+          - files: "directory/*"
+          to:
+            data: "data from files"
+
+    - "Load data from memory to file":
+      - load:
+          from:
+          - data: "data for file"
+          to:
+            file: "directory/file.yaml"
+            format: "yaml"
+
+    - "Load data from one branch to another in memory":
+      - load:
+          from:
+          - data: "original data branch"
+          to:
+            data: "another data branch"
+
+    - "Load data from one file to another":
+      - load:
+          from:
+          - files: "original.yaml"
+          to:
+            file: "another.json"
+            format: "json"
+'''
+
+
 class Loader:
     """
     Copy data structures between different sources and targets such as files and memory.
