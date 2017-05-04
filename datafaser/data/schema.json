@@ -102,6 +102,36 @@
                     }
                   }
                 }
+              },
+              "change": {
+                "title": "Datafaser change operation",
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["from", "to"],
+                "properties": {
+                  "from": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "branch": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "to": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "branch": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "keys": {
+                    "type": "object",
+                    "additionalProperties": true
+                  }
+                }
               }
             }
           }

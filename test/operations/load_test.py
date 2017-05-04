@@ -2,7 +2,7 @@ import copy
 import unittest
 
 from datafaser.data_tree import DataTree
-from datafaser.operations import Loader
+from datafaser.operations.load import Loader
 from test import minimum_required_settings
 
 
