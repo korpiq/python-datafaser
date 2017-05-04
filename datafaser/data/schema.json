@@ -129,7 +129,43 @@
                   },
                   "keys": {
                     "type": "object",
-                    "additionalProperties": true
+                    "patternProperties": {
+                      ".*": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "others": {
+                    "type": "string"
+                  }
+                }
+              },
+              "each": {
+                "title": "Datafaser operation to operate on each member of a collection",
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["from", "to", "do"],
+                "properties": {
+                  "from": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "branch": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "to": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "branch": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "do": {
+                    "type": "object"
                   }
                 }
               }
