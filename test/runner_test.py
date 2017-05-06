@@ -11,10 +11,10 @@ from test import minimum_required_settings
 
 class RunnerTest(unittest.TestCase):
 
-    _read_yaml_plan = [{'load': {'from': [{'files': path_to_test_data('yaml_files')}]}}]
+    _read_yaml_plan = [{'load': {'from': {'file': path_to_test_data('yaml_files')}}}]
     _read_yaml_result = {'a_list': ['foo', 'bar'], 'a_map': {'foo': 'bar'}}
 
-    _read_schema_plan = [{'load': {'from': [{'files': path_to_test_data('test_data_schema.json')}]}}]
+    _read_schema_plan = [{'load': {'from': {'file': path_to_test_data('test_data_schema.json')}}}]
 
     _runnable_configuration = deepcopy(minimum_required_settings)
     _runnable_configuration['datafaser']['run'] = {
@@ -36,11 +36,7 @@ class RunnerTest(unittest.TestCase):
 
     def test_run_load_nothing_ok(self):
         Runner(self.data_tree).run_operation([{'load': {}}])
-        self.assertEquals(minimum_required_settings, self.data_tree.data, 'Empty load list does not add data')
-
-    def test_run_load_zero_files_ok(self):
-        Runner(self.data_tree).run_operation([{'load': {'from': [{'files': []}]}}])
-        self.assertEquals(minimum_required_settings, self.data_tree.data, 'Empty load files list does not add data')
+        self.assertEquals(minimum_required_settings, self.data_tree.data, 'Empty load item does not add data')
 
     def test_run_load_yaml_from_directory_ok(self):
         Runner(self.data_tree).run_operation(deepcopy(self._read_yaml_plan))
@@ -48,7 +44,7 @@ class RunnerTest(unittest.TestCase):
         self.assertEquals(self._read_yaml_result, self.data_tree.data, 'Load files from directory adds data')
 
     def test_run_load_to_data_ok(self):
-        plan = [{'load': {'from': self._read_yaml_plan[0]['load']['from'], 'to': {'data': 'inner.target'}}}]
+        plan = [{'load': {'from': self._read_yaml_plan[0]['load']['from'], 'to': {'branch': 'inner.target'}}}]
         Runner(self.data_tree).run_operation(plan)
         expected = {'inner': {'target': self._read_yaml_result}}
         expected.update(minimum_required_settings)
@@ -58,7 +54,7 @@ class RunnerTest(unittest.TestCase):
         base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
         with tempfile.TemporaryDirectory(dir=os.path.join(base_dir, 'datafaser-dev-env')) as temp_dir:
             temp_file = os.path.join(temp_dir, 'file_writing_test.output')
-            plan = [{'load': {'from': [{'data': ['test.data']}], 'to': {'file': temp_file, 'format': 'json'}}}]
+            plan = [{'load': {'from': {'branch': 'test.data'}, 'to': {'file': temp_file, 'format': 'json'}}}]
             self.data_tree.data.update({'test': {'data': {'key': 'test value'}}})
             Runner(self.data_tree).run_operation(plan)
             expected = '{\n    "key": "test value"\n}\n'

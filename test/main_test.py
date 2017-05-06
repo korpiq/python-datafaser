@@ -40,7 +40,7 @@ class MetaMainModuleTest(unittest.TestCase, OutputBlocker):
         self.original_argv = sys.argv
         self.original_path = sys.path
         self.original_operations_provider = operations.get_default_operations_map
-        self.got_files = None
+        self.got_files = []
         self.block_output()
 
     def tearDown(self):
@@ -51,7 +51,8 @@ class MetaMainModuleTest(unittest.TestCase, OutputBlocker):
 
     def test_starts_ok(self):
         self._run_main()
-        self.assertEqual(sys.argv[1:], self.got_files, '__main__ runs with command-line arguments without program name')
+        self.assertRegexpMatches(self.got_files[0], '.*/datafaser/data$', '__main__ loads datafaser schema')
+        self.assertEqual(sys.argv[1:], self.got_files[1:], '__main__ runs with command-line arguments without program name')
 
     def test_unrecognized_option_fails(self):
         self._run_main(['datafaser', '--bad-option'])
@@ -72,7 +73,7 @@ class MetaMainModuleTest(unittest.TestCase, OutputBlocker):
         return {'load': self._mock_load}
 
     def _mock_load(self, data_tree, directives):
-        self.got_files = directives['from'][0]['files']
+        self.got_files.append(directives['from']['file'])
         self._create_schema_required_for_validation(data_tree)
 
     def _create_schema_required_for_validation(self, data_tree):

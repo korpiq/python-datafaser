@@ -19,31 +19,19 @@ class LoadTest(unittest.TestCase):
     def test_load_nothing_to_data_ok(self):
         target = {'There': 'Misty Mountain'}
         back = target.copy()
-        self.loader.load(DataTree(target), {'to': {'data': 'Back'}})
+        self.loader.load(DataTree(target), {'to': {'branch': 'Back'}})
         self.assertEquals({'There': 'Misty Mountain', 'Back': back}, target,
                           'Loading nothing to nonexistent key copies whole data to target')
 
     def test_load_from_data_to_data_ok(self):
         target = {'There': 'Misty Mountain'}
-        self.loader.load(DataTree(target), {'from': [{'data': ['There']}], 'to': {'data': 'Back'}})
+        self.loader.load(DataTree(target), {'from': {'branch': 'There'}, 'to': {'branch': 'Back'}})
         self.assertEquals({'There': 'Misty Mountain', 'Back': 'Misty Mountain'}, target,
                           'Loading from data to data copies the source to the target')
 
-    def test_load_from_dictionary_fails(self):
-        exception = self._exception_from_loading_with({}, {'from': {}})
+    def test_load_from_list_fails(self):
+        exception = self._exception_from_loading_with({}, {'from': []})
         self.assertIsInstance(exception, TypeError, 'Invalid from structure causes type error')
-
-    def test_load_from_non_dict_source_fails(self):
-        exception = self._exception_from_loading_with({}, {'from': [[]]})
-        self.assertIsInstance(exception, TypeError, 'Invalid from source causes type error')
-
-    def test_load_from_non_list_files_source_fails(self):
-        exception = self._exception_from_loading_with({}, {'from': [{'files': 'y'}]})
-        self.assertIsInstance(exception, TypeError, 'Invalid from source causes type error')
-
-    def test_load_from_unknown_source_type_fails(self):
-        exception = self._exception_from_loading_with({}, {'from': [{'x': []}]})
-        self.assertIsInstance(exception, KeyError, 'Invalid from source causes type error')
 
     def _exception_from_loading_with(self, source, directives):
         try:

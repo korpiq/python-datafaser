@@ -67,8 +67,13 @@ class FileLoaderTest(unittest.TestCase):
         self.maxDiff = None
 
     def test_loads_nothing_ok(self):
-        self.loader.load([])
-        self.assertEquals({}, self.data_tree.data, 'Loader loads nothing')
+        exception = None
+        try:
+            self.loader.default_format='text'
+            self.loader.load("")
+        except Exception as e:
+            exception = e
+        self.assertIsInstance(exception, ValueError, 'Loading empty filename must fail')
 
     def test_loads_yaml_map_ok(self):
         self.loader.load(path_to_test_data('yaml_files', 'a_map.yaml'))

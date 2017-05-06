@@ -54,13 +54,8 @@ def get_load_phase_for_files(files, phase_name):
     :return: data structure containing run plan phase to load files given as arguments
     """
 
-    return {phase_name: [{
-        'load': {
-            'from': [{
-                'files': files
-            }]
-        }
-    }]}
+    steps = [{'load': {'from': {'file': file}}} for file in files]
+    return {phase_name: steps}
 
 
 def get_schema_filepath():

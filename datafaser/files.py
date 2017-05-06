@@ -18,26 +18,27 @@ class FileLoader:
         self.format_register = format_register
         self.logger = logging.getLogger(__name__)
 
-    def load(self, sources):
+    def load(self, source):
         """
-        Loads data from files in given sources. Each source path must be relative and
+        Loads data from files in given relative source path.
         Each found file with a name ending in an extension mapped to a parser
         will be parsed with that parser. Contents will be added to
         data at path associated with the path of the file in source directory,
         so that contents of 'top/sub/key.txt' will be available at 'top.sub.key'.
 
-        :param sources: list of strings: paths to files or directories to read
+        :param source: list of strings: paths to files or directories to read
         """
 
-        for source in sources:
-            if source == '-':
-                if self.default_format is None:
-                    raise ValueError('Please specify default format to read from standard input.')
-                self._read_stream(sys.stdin, self.format_register.get_format_by_name(self.default_format), None)
-            elif isinstance(source, str):
-                self._read_file_or_directory(_ensure_allowed_path(source))
-            else:
-                raise ValueError('File source name must be text: "%s" is %s' % (source, type(source)))
+        if source == '-':
+            if self.default_format is None:
+                raise ValueError('Please specify default format to read from standard input.')
+            self._read_stream(sys.stdin, self.format_register.get_format_by_name(self.default_format), None)
+        elif isinstance(source, str):
+            if not source:
+                raise ValueError('Name of file to load is empty')
+            self._read_file_or_directory(_ensure_allowed_path(source))
+        else:
+            raise ValueError('File source name must be text: "%s" is %s' % (source, type(source)))
 
     def _read_file_or_directory(self, absolute_source):
         if os.path.isfile(absolute_source):

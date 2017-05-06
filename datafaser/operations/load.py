@@ -12,14 +12,14 @@ Load data between files and branches of data tree in memory:
     - "Load data from files":
       - load:
           from:
-          - files: "directory/*"
+            file: "directory/*"
           to:
-            data: "data from files"
+            branch: "data from files"
 
     - "Load data from memory to file":
       - load:
           from:
-          - data: "data for file"
+            branch: "data for file"
           to:
             file: "directory/file.yaml"
             format: "yaml"
@@ -27,14 +27,14 @@ Load data between files and branches of data tree in memory:
     - "Load data from one branch to another in memory":
       - load:
           from:
-          - data: "original data branch"
+            branch: "original data branch"
           to:
-            data: "another data branch"
+            branch: "another data branch"
 
     - "Load data from one file to another":
       - load:
           from:
-          - files: "original.yaml"
+            file: "original.yaml"
           to:
             file: "another.json"
             format: "json"
@@ -59,25 +59,14 @@ class Loader:
 
         if 'from' in directives:
             new_data = DataTree({})
-            sources = directives['from']
-            if not isinstance(sources, list):
-                raise TypeError('Not a list of sources to load from: %s' % type(sources).__name__)
-            for source in sources:
-                if not isinstance(source, dict):
-                    raise TypeError('Not a dictionary of sources to load from: %s' % type(source).__name__)
-                for source_type, source_values in source.items():
-                    if not isinstance(source_values, list):
-                        raise TypeError(
-                                'Not a list of %s sources to load from: %s' %
-                                (source_type, type(source_values).__name__)
-                        )
-                    if source_type == 'files':
-                        FileLoader(new_data, self.format_register, self._get_default_format()).load(source_values)
-                    elif source_type == 'data':
-                        for key in source_values:
-                            new_data.merge(data_tree.reach(key))
-                    else:
-                        raise KeyError('Unknown load source type: "%s"' % source_type)
+            source = directives['from']
+            if not isinstance(source, dict):
+                raise TypeError('Not a dictionary of sources to load from: %s' % type(source).__name__)
+            if 'file' in source:
+                FileLoader(new_data, self.format_register, source.get('format') or self._get_default_format()).load(source['file'])
+            if 'branch' in source:
+                self.logger.info('Load from branch: "%s"' % source['branch'])
+                new_data.merge(data_tree.reach(source['branch']))
         else:
             new_data = DataTree(data_tree.data.copy())
 
@@ -90,12 +79,12 @@ class Loader:
         if not isinstance(target, dict):
             raise TypeError('Not a dictionary of target types to targets to save to: %s' % type(target).__name__)
 
-        if 'data' in target:
-            self.logger.info('Store read data at: "%s"' % target['data'])
-            data_tree.merge(new_data.data, target['data'])
+        if 'branch' in target:
+            self.logger.info('Store to branch: "%s"' % target['branch'])
+            data_tree.merge(new_data.data, target['branch'])
 
         if 'file' in target:
-            self.logger.info('Save read data to: "%s"' % target['file'])
+            self.logger.info('Save to file: "%s"' % target['file'])
 
             writer = FileSaver(new_data.data, self.format_register)
             filename = target['file']
