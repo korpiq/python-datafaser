@@ -168,6 +168,35 @@
                     "type": "object"
                   }
                 }
+              },
+              "fill": {
+                "title": "Datafaser operation to fill in a template with current values",
+                "type": "object",
+                "additionalProperties": false,
+                "required": ["from", "to", "template"],
+                "properties": {
+                  "from": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "branch": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "to": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "branch": {
+                        "type": "string"
+                      }
+                    }
+                  },
+                  "template": {
+                    "type": "string"
+                  }
+                }
               }
             }
           }
