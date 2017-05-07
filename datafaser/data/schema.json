@@ -138,7 +138,7 @@
                 "title": "Datafaser operation to operate on each member of a collection",
                 "type": "object",
                 "additionalProperties": false,
-                "required": ["from", "to", "do"],
+                "required": ["from", "do"],
                 "properties": {
                   "from": {
                     "type": "object",

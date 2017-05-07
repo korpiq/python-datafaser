@@ -1,5 +1,6 @@
-import copy
+from jinja2 import Template
 import datafaser.operations
+
 
 help_topic = 'Each operation'
 help_text = '''
@@ -35,7 +36,9 @@ Operation under "do" is used to produce an item to to.branch from each item in f
 
 def convert(data_tree, directives):
     from_branch = directives['from']['branch']
-    to_branch = directives['to']['branch']
+    to = directives.get('to', {})
+    has_to_branch = 'branch' in to
+    to_branch = to.get('branch', None)
 
     operation_name = list(directives['do'].keys())[0]
     operation_directives = directives['do'][operation_name]
@@ -45,23 +48,39 @@ def convert(data_tree, directives):
 
     if isinstance(source, list):
         keys = range(0, len(source))
-        data_tree.merge([], to_branch)
+        collection_type = list
     else:
         keys = source.keys()
-        data_tree.merge({}, to_branch)
+        collection_type = dict
 
-    target = data_tree.reach(to_branch)
+    if has_to_branch:
+        data_tree.merge(collection_type(), to_branch)
+        target = data_tree.reach(to_branch)
 
     for key in keys:
         value = source[key]
-        value_class = value.__class__
-        if isinstance(source, list):
-            target.append(value_class())
-        else:
-            target[key] = value_class()
+        if has_to_branch:
+            value_class = value.__class__
+            if collection_type is list:
+                target.append(value_class())
+            else:
+                target[key] = value_class()
 
-        call_directives = copy.deepcopy(operation_directives)
-        call_directives['from'] = {'branch': '%s.%s' % (from_branch, key)}
-        call_directives['to'] = {'branch': '%s.%s' % (to_branch, key)}
+        template_values = { 'key': key, 'value': value, 'data': data_tree.data }
+
+        call_directives = _render_all_strings(operation_directives, template_values)
+        call_directives['from'] = {'branch': [from_branch, key]}
+        if has_to_branch:
+            call_directives['to'] = {'branch': [to_branch, key]}
 
         operation(data_tree, call_directives)
+
+
+def _render_all_strings(branch, data):
+    if isinstance(branch, str):
+        return Template(branch).render(data)
+    elif isinstance(branch, dict):
+        return {_render_all_strings(key, data): _render_all_strings(value, data) for key, value in branch.items()}
+    elif isinstance(branch, list):
+        return [_render_all_strings(value, data) for value in branch]
+    return branch
