@@ -58,6 +58,10 @@ class Main:
             self.usage(options_schema)
             sys.exit(1)
 
+        if 'version' in self.options:
+            self.version()
+            sys.exit(1)
+
         return arguments
 
     def help_on(self, topic):
@@ -109,6 +113,11 @@ class Main:
             if 'type' in schema and schema['type'] != 'boolean':
                 option_name += '='
             yield option_name
+
+    def version(self):
+        with open(os.path.join(os.path.dirname(__file__), 'VERSION')) as f:
+            version = f.read().strip()
+        sys.stderr.write('%s %s\n' % ('datafaser', version))
 
     def setup_logging(self):
         reload(logging)

@@ -237,6 +237,10 @@
                 "help": {
                   "title": "Explain usage instead of normal operation.",
                   "type": "boolean"
+                },
+                "version": {
+                  "title": "Report version of this application.",
+                  "type": "boolean"
                 }
               }
             },

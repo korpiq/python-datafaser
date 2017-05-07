@@ -8,13 +8,16 @@ here = path.abspath(path.dirname(__file__))
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
+with open(path.join(here, 'datafaser', 'VERSION')) as f:
+    version = f.read().strip()
+
 setup(
     name='datafaser',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='0.1.2',
+    version=version,
     description='Data combiner and converter',
     long_description=long_description,
     url='https://github.com/korpiq/python-datafaser',
