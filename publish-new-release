@@ -1,4 +1,5 @@
 set -e
+source datafaser-dev-env/bin/activate
 rm -rf build dist
 python setup.py bdist_wheel
 gpg --detach-sign -a dist/*.whl
