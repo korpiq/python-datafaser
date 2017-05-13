@@ -1,0 +1,5 @@
+set -e
+rm -rf build dist
+python setup.py bdist_wheel
+gpg --detach-sign -a dist/*.whl
+twine upload dist/*.whl dist/*.whl.asc "$@"
