@@ -1,6 +1,8 @@
 Datafaser
 =========
 
+[![Sponsored](https://img.shields.io/badge/chilicorn-sponsored-brightgreen.svg)](http://spiceprogram.org/oss-sponsorship/)
+
 Datafaser collects and generates data, then fills in templates to generate files.
 
 Results of each phase are checked against data schemas and content descriptions.
